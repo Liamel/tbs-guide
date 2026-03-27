@@ -1,21 +1,56 @@
-import Link from "next/link";
-import { ArrowRight, Compass, Landmark, Wine } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { ChevronRight, Compass, Landmark, Wine } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { DestinationCard } from "@/components/marketing/destination-card";
 import { EntryCard } from "@/components/marketing/entry-card";
-import { getHomepageView } from "@/lib/content/service";
+import { Button } from "@/components/ui/button";
+import { getDestinationViews, getHomepageView, listEntriesBySection } from "@/lib/content/service";
 import { assertLocale, getDictionary } from "@/lib/i18n";
+
+function SectionHeader({
+  eyebrow,
+  title,
+  description,
+  href,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  href: string;
+}) {
+  return (
+    <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div className="space-y-2">
+        <p className="eyebrow">{eyebrow}</p>
+        <h2 className="font-heading text-3xl sm:text-4xl">{title}</h2>
+        <p className="max-w-3xl text-muted-foreground">{description}</p>
+      </div>
+      <Link
+        href={href}
+        className="inline-flex items-center gap-1.5 text-sm font-semibold tracking-[0.16em] uppercase text-primary"
+      >
+        ALL
+        <ChevronRight className="size-4" />
+      </Link>
+    </div>
+  );
+}
 
 export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   const locale = assertLocale(lang);
   const dict = getDictionary(locale);
-  const home = await getHomepageView(locale);
+  const [home, destinations, vineyards] = await Promise.all([
+    getHomepageView(locale),
+    getDestinationViews(locale),
+    listEntriesBySection(locale, "vineyards"),
+  ]);
+  const vineyardFeature = home.featuredVineyard ?? vineyards[0];
 
   return (
     <div className="space-y-16 pb-6 pt-6 sm:space-y-24">
-      <section className="editorial-shell">
+      <section id="destinations" className="editorial-shell scroll-mt-32 space-y-8">
         <div className="grid gap-6 lg:grid-cols-[1.18fr_0.82fr]">
           <div className="relative min-h-[560px] overflow-hidden rounded-[2rem] lg:min-h-[680px]">
             <Image
@@ -70,7 +105,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                   Discover routes where architecture, wine, and ritual become one story.
                 </h2>
                 <p className="text-base leading-7 text-muted-foreground">
-                  This first edition focuses on heritage landmarks and cultural routes that feel editorial, tactile, and distinctly Georgian.
+                  This first edition focuses on heritage landmarks and cultural routes that feel
+                  editorial, tactile, and distinctly Georgian.
                 </p>
               </div>
             </div>
@@ -93,20 +129,34 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
             </div>
           </div>
         </div>
+
+        <div className="space-y-6">
+          <SectionHeader
+            eyebrow={dict.nav.destinations}
+            title={dict.nav.destinations}
+            description="Start from Georgia’s major regions, then move deeper into the monuments, vineyards, and lived cultural rituals attached to each place."
+            href={`/${locale}/destinations`}
+          />
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {destinations.map((destination) => (
+              <DestinationCard
+                key={destination.id}
+                destination={destination}
+                href={`/${locale}/destinations#${destination.slug}`}
+                locale={locale}
+              />
+            ))}
+          </div>
+        </div>
       </section>
 
-      <section className="editorial-shell space-y-8">
-        <div className="flex items-end justify-between gap-6">
-          <div className="space-y-2">
-            <p className="eyebrow">{dict.home.mustSee}</p>
-            <h2 className="font-heading text-3xl sm:text-4xl">{dict.home.mustSee}</h2>
-            <p className="max-w-2xl text-muted-foreground">{dict.home.mustSeeDescription}</p>
-          </div>
-          <Link href={`/${locale}/heritage`} className="hidden items-center gap-2 text-sm text-primary md:inline-flex">
-            {dict.cta.readMore}
-            <ArrowRight className="size-4" />
-          </Link>
-        </div>
+      <section id="heritage" className="editorial-shell scroll-mt-32 space-y-8">
+        <SectionHeader
+          eyebrow={dict.nav.heritage}
+          title={dict.nav.heritage}
+          description={dict.home.mustSeeDescription}
+          href={`/${locale}/heritage`}
+        />
         <div className="grid gap-6 md:grid-cols-3">
           {home.mustSee.map((entry) => (
             <EntryCard
@@ -118,26 +168,31 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         </div>
       </section>
 
-      {home.featuredVineyard ? (
-        <section className="editorial-shell">
+      {vineyardFeature ? (
+        <section id="vineyards" className="editorial-shell scroll-mt-32 space-y-8">
+          <SectionHeader
+            eyebrow={dict.nav.vineyards}
+            title={dict.nav.vineyards}
+            description="Editorial routes through historic cellars, long vineyard horizons, and the architecture of Georgian wine culture."
+            href={`/${locale}/vineyards`}
+          />
           <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
             <EntryCard
-              entry={home.featuredVineyard}
-              href={`/${locale}/${home.featuredVineyard.section}/${home.featuredVineyard.slug}`}
+              entry={vineyardFeature}
+              href={`/${locale}/${vineyardFeature.section}/${vineyardFeature.slug}`}
               tall
             />
             <div className="surface-break relative overflow-hidden rounded-[2rem] px-6 py-8 sm:px-8">
               <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-[radial-gradient(circle_at_center,rgba(161,60,63,0.16),transparent_56%)] lg:block" />
               <div className="relative z-10 max-w-xl space-y-5">
                 <p className="eyebrow">{dict.home.featuredVineyardLabel}</p>
-                <h2 className="font-heading text-3xl sm:text-4xl">
-                  {home.featuredVineyard.title}
-                </h2>
-                <p className="leading-7 text-muted-foreground">{home.featuredVineyard.summary}</p>
+                <h2 className="font-heading text-3xl sm:text-4xl">{vineyardFeature.title}</h2>
+                <p className="leading-7 text-muted-foreground">{vineyardFeature.summary}</p>
                 <div className="glass-panel-strong max-w-xs rounded-[1.5rem] p-6">
                   <p className="font-heading text-4xl text-primary">8k</p>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Years of recorded viticulture shape the editorial identity of the KARTLI vineyard routes.
+                    Years of recorded viticulture shape the editorial identity of the KARTLI
+                    vineyard routes.
                   </p>
                 </div>
                 <Button
@@ -152,11 +207,13 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         </section>
       ) : null}
 
-      <section className="editorial-shell space-y-8">
-        <div className="space-y-2">
-          <p className="eyebrow">{dict.home.experiencesLabel}</p>
-          <h2 className="font-heading text-3xl sm:text-4xl">{dict.home.experiencesLabel}</h2>
-        </div>
+      <section id="experiences" className="editorial-shell scroll-mt-32 space-y-8">
+        <SectionHeader
+          eyebrow={dict.nav.experiences}
+          title={dict.nav.experiences}
+          description="Culture-first routes focused on table ritual, music, workshops, and atmosphere rather than checklist stops."
+          href={`/${locale}/experiences`}
+        />
         <div className="grid gap-6 md:grid-cols-3">
           {home.experiences.map((entry) => (
             <EntryCard

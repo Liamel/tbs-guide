@@ -136,8 +136,7 @@ const mediaAssets: MediaAssetRecord[] = [
   {
     id: "media-home-hero",
     publicId: "sample/home-hero",
-    secureUrl:
-      "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1600&q=80",
+    secureUrl: "/media/home-hero.jpg",
     width: 1600,
     height: 1000,
     alt: {
@@ -151,8 +150,7 @@ const mediaAssets: MediaAssetRecord[] = [
   {
     id: "media-vardzia",
     publicId: "sample/vardzia",
-    secureUrl:
-      "https://images.unsplash.com/photo-1715595621488-6450fb770d2d?auto=format&fit=crop&w=1200&q=80",
+    secureUrl: "/media/vardzia.jpg",
     width: 1200,
     height: 900,
     alt: emptyLocaleText("Vardzia Cave Monastery"),
@@ -162,8 +160,7 @@ const mediaAssets: MediaAssetRecord[] = [
   {
     id: "media-gergeti",
     publicId: "sample/gergeti",
-    secureUrl:
-      "https://images.unsplash.com/photo-1575731400875-6c2f1550b8db?auto=format&fit=crop&w=1200&q=80",
+    secureUrl: "/media/gergeti.jpg",
     width: 1200,
     height: 900,
     alt: emptyLocaleText("Gergeti Trinity Church"),
@@ -173,8 +170,7 @@ const mediaAssets: MediaAssetRecord[] = [
   {
     id: "media-ushguli",
     publicId: "sample/ushguli",
-    secureUrl:
-      "https://images.unsplash.com/photo-1665302510594-2570d72a016f?auto=format&fit=crop&w=1200&q=80",
+    secureUrl: "/media/ushguli.jpg",
     width: 1200,
     height: 900,
     alt: emptyLocaleText("Ushguli Towers"),
@@ -184,8 +180,7 @@ const mediaAssets: MediaAssetRecord[] = [
   {
     id: "media-uplistsikhe",
     publicId: "sample/uplistsikhe",
-    secureUrl:
-      "https://images.unsplash.com/photo-1689845061422-2d5c819e9395?auto=format&fit=crop&w=1200&q=80",
+    secureUrl: "/media/uplistsikhe.jpg",
     width: 1200,
     height: 900,
     alt: emptyLocaleText("Uplistsikhe Cave City"),
@@ -195,8 +190,7 @@ const mediaAssets: MediaAssetRecord[] = [
   {
     id: "media-jvari",
     publicId: "sample/jvari",
-    secureUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/6/6b/Jvari_Monastery%2C_Mtskheta%2C_Georgia.jpg",
+    secureUrl: "/media/jvari.jpg",
     width: 1400,
     height: 933,
     alt: emptyLocaleText("Jvari Monastery"),
@@ -206,8 +200,7 @@ const mediaAssets: MediaAssetRecord[] = [
   {
     id: "media-vineyard",
     publicId: "sample/vineyard",
-    secureUrl:
-      "https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?auto=format&fit=crop&w=1200&q=80",
+    secureUrl: "/media/vineyard.jpg",
     width: 1200,
     height: 900,
     alt: emptyLocaleText("Historic vineyard vessel"),
@@ -217,8 +210,7 @@ const mediaAssets: MediaAssetRecord[] = [
   {
     id: "media-polyphony",
     publicId: "sample/polyphony",
-    secureUrl:
-      "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80",
+    secureUrl: "/media/polyphony.jpg",
     width: 1200,
     height: 900,
     alt: emptyLocaleText("Polyphonic singing performance"),
@@ -228,8 +220,7 @@ const mediaAssets: MediaAssetRecord[] = [
   {
     id: "media-supra",
     publicId: "sample/supra",
-    secureUrl:
-      "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80",
+    secureUrl: "/media/supra.jpg",
     width: 1200,
     height: 900,
     alt: emptyLocaleText("Traditional Georgian feast"),
@@ -239,8 +230,7 @@ const mediaAssets: MediaAssetRecord[] = [
   {
     id: "media-artisans",
     publicId: "sample/artisans",
-    secureUrl:
-      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
+    secureUrl: "/media/artisans.jpg",
     width: 1200,
     height: 900,
     alt: emptyLocaleText("Artisan workshop"),

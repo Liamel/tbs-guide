@@ -15,17 +15,35 @@ import {
 } from "@/lib/data/schema";
 import { defaultLocale, getEntryTypeFromSection, getSectionFromEntryType, pickLocaleText } from "@/lib/i18n";
 import type {
+  DestinationView,
   EntryCardView,
   EntryDetailView,
   EntryRecord,
+  MediaAssetRecord,
   HomepageView,
+  SearchResultView,
   SiteSnapshot,
 } from "@/lib/content/types";
 import type { EntrySection, EntryType, Locale } from "@/lib/i18n";
+import { normalizeMediaAssetUrl } from "@/lib/content/media";
 import { sampleSiteSnapshot } from "@/lib/content/sample-data";
 
 function fallbackSnapshot() {
-  return structuredClone(sampleSiteSnapshot);
+  return normalizeSnapshot(structuredClone(sampleSiteSnapshot));
+}
+
+function normalizeMediaAssetRecord(asset: MediaAssetRecord): MediaAssetRecord {
+  return {
+    ...asset,
+    secureUrl: normalizeMediaAssetUrl(asset.secureUrl),
+  };
+}
+
+function normalizeSnapshot(snapshot: SiteSnapshot): SiteSnapshot {
+  return {
+    ...snapshot,
+    mediaAssets: snapshot.mediaAssets.map(normalizeMediaAssetRecord),
+  };
 }
 
 async function loadSnapshotFromDatabase(): Promise<SiteSnapshot> {
@@ -141,7 +159,7 @@ async function loadSnapshotFromDatabase(): Promise<SiteSnapshot> {
     return fallbackSnapshot();
   }
 
-  return {
+  return normalizeSnapshot({
     regions: regionRows,
     categories: categoryRows,
     mediaAssets: mediaRows.map((row) => ({
@@ -152,7 +170,7 @@ async function loadSnapshotFromDatabase(): Promise<SiteSnapshot> {
     entries: Array.from(entryMap.values()),
     homepage: homepageRow,
     homepageSlots: homepageSlotRows,
-  };
+  });
 }
 
 export async function loadSiteSnapshot(): Promise<SiteSnapshot> {
@@ -194,6 +212,120 @@ function buildCardView(
     locationLabel: translation.locationLabel,
     featured: entry.isFeatured,
   };
+}
+
+function scoreSearchMatch(text: string, query: string, title: string, summary: string, regionName: string) {
+  let score = 0;
+
+  if (title.startsWith(query)) {
+    score += 60;
+  } else if (title.includes(query)) {
+    score += 36;
+  }
+
+  if (summary.includes(query)) {
+    score += 14;
+  }
+
+  if (regionName.includes(query)) {
+    score += 8;
+  }
+
+  if (text.includes(query)) {
+    score += 4;
+  }
+
+  return score;
+}
+
+export async function getDestinationViews(locale: Locale): Promise<DestinationView[]> {
+  const snapshot = await loadSiteSnapshot();
+
+  return snapshot.regions
+    .slice()
+    .sort((left, right) => left.orderIndex - right.orderIndex)
+    .map((region) => {
+      const regionEntries = snapshot.entries
+        .filter((entry) => entry.isPublished && entry.regionId === region.id)
+        .sort((left, right) => left.sortOrder - right.sortOrder);
+      const leadEntry = regionEntries[0];
+      const leadCard = leadEntry ? buildCardView(snapshot, leadEntry, locale) : undefined;
+
+      return {
+        id: region.id,
+        slug: region.slug,
+        name: pickLocaleText(region.name, locale),
+        description: pickLocaleText(region.description, locale),
+        imageUrl: leadCard?.imageUrl ?? sampleSiteSnapshot.mediaAssets[0].secureUrl,
+        imageAlt: leadCard?.imageAlt || pickLocaleText(region.name, locale),
+        storyCount: regionEntries.length,
+        sections: Array.from(
+          new Set(regionEntries.map((entry) => getSectionFromEntryType(entry.type))),
+        ),
+      };
+    });
+}
+
+export async function searchEntries(
+  locale: Locale,
+  query: string,
+  limit = 6,
+): Promise<SearchResultView[]> {
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+
+  if (normalizedQuery.length < 2) {
+    return [];
+  }
+
+  const snapshot = await loadSiteSnapshot();
+  const terms = normalizedQuery.split(/\s+/).filter(Boolean);
+
+  return snapshot.entries
+    .filter((entry) => entry.isPublished)
+    .flatMap((entry) => {
+      const card = buildCardView(snapshot, entry, locale);
+      const translation = entry.translations[locale] ?? entry.translations[defaultLocale];
+      const searchText = [
+        card.title,
+        card.summary,
+        card.eyebrow,
+        card.regionName,
+        ...card.categoryLabels,
+        translation.body,
+      ]
+        .join(" ")
+        .toLocaleLowerCase();
+
+      if (!terms.every((term) => searchText.includes(term))) {
+        return [];
+      }
+
+      return [
+        {
+          ...card,
+          score: scoreSearchMatch(
+            searchText,
+            normalizedQuery,
+            card.title.toLocaleLowerCase(),
+            card.summary.toLocaleLowerCase(),
+            card.regionName.toLocaleLowerCase(),
+          ),
+        },
+      ];
+    })
+    .sort((left, right) => right.score - left.score)
+    .slice(0, limit)
+    .map((result) => ({
+      id: result.id,
+      slug: result.slug,
+      section: result.section,
+      title: result.title,
+      summary: result.summary,
+      eyebrow: result.eyebrow,
+      imageUrl: result.imageUrl,
+      imageAlt: result.imageAlt,
+      regionName: result.regionName,
+    }));
 }
 
 export async function getHomepageView(locale: Locale): Promise<HomepageView> {

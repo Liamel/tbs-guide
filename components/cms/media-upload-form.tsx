@@ -4,7 +4,9 @@ import { startTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
+import { Trash2 } from "lucide-react";
 
+import { deleteMediaAssetAction } from "@/app/CMS/actions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,9 +15,11 @@ import type { MediaAssetRecord } from "@/lib/content/types";
 
 export function MediaUploadForm({
   assets,
+  assetUsage,
   disabled,
 }: {
   assets: MediaAssetRecord[];
+  assetUsage: Record<string, number>;
   disabled: boolean;
 }) {
   const router = useRouter();
@@ -24,6 +28,10 @@ export function MediaUploadForm({
   const [altKa, setAltKa] = useState("");
   const [altRu, setAltRu] = useState("");
   const [pending, setPending] = useState(false);
+  const [deletingAssetId, setDeletingAssetId] = useState<string | null>(null);
+  const mediaLibrary = [...assets].sort(
+    (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+  );
 
   return (
     <div className="space-y-6">
@@ -112,25 +120,69 @@ export function MediaUploadForm({
       </Card>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {assets.map((asset) => (
-          <Card key={asset.id} className="glass-panel border-0 p-0 ring-0">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-t-[1.25rem]">
-              <Image
-                src={asset.secureUrl}
-                alt={asset.alt.en || asset.publicId}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
-            </div>
-            <div className="space-y-2 px-4 py-4">
-              <p className="font-heading text-lg">{asset.alt.en || asset.publicId}</p>
-              <p className="truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                {asset.publicId}
-              </p>
-            </div>
-          </Card>
-        ))}
+        {mediaLibrary.map((asset) => {
+          const usageCount = assetUsage[asset.id] ?? 0;
+
+          return (
+            <Card key={asset.id} className="glass-panel border-0 p-0 ring-0">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-t-[1.25rem]">
+                <Image
+                  src={asset.secureUrl}
+                  alt={asset.alt.en || asset.publicId}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </div>
+              <div className="space-y-3 px-4 py-4">
+                <p className="font-heading text-lg">{asset.alt.en || asset.publicId}</p>
+                <p className="truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                  {asset.publicId}
+                </p>
+                <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+                  <span>
+                    {asset.width} x {asset.height}
+                  </span>
+                  <span>{usageCount} linked</span>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full rounded-xl"
+                  disabled={disabled || deletingAssetId === asset.id}
+                  onClick={() => {
+                    const message =
+                      usageCount > 0
+                        ? `Delete this image? ${usageCount} entries currently reference it and they will fall back until you assign new media.`
+                        : "Delete this image from the CMS library and Cloudinary?";
+
+                    if (!window.confirm(message)) {
+                      return;
+                    }
+
+                    startTransition(async () => {
+                      try {
+                        setDeletingAssetId(asset.id);
+                        await deleteMediaAssetAction(asset.id);
+                        toast.success("Media deleted.");
+                        router.refresh();
+                      } catch (error) {
+                        toast.error(
+                          error instanceof Error ? error.message : "Unable to delete media.",
+                        );
+                      } finally {
+                        setDeletingAssetId(null);
+                      }
+                    });
+                  }}
+                >
+                  <Trash2 className="size-4" />
+                  {deletingAssetId === asset.id ? "Deleting..." : "Delete Image"}
+                </Button>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

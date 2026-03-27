@@ -161,6 +161,29 @@ export type EntryDetailView = EntryCardView & {
   }[];
 };
 
+export type DestinationView = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  imageAlt: string;
+  storyCount: number;
+  sections: EntrySection[];
+};
+
+export type SearchResultView = {
+  id: string;
+  slug: string;
+  section: EntrySection;
+  title: string;
+  summary: string;
+  eyebrow: string;
+  imageUrl: string;
+  imageAlt: string;
+  regionName: string;
+};
+
 export type HomepageView = {
   hero: {
     kicker: string;

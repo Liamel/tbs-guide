@@ -32,6 +32,10 @@ export default async function EntryDetailPage({
     notFound();
   }
 
+  const googleMapsHref = `https://www.google.com/maps/search/?api=1&query=${entry.latitude},${entry.longitude}`;
+  const googleMapsEmbedSrc = `https://www.google.com/maps?q=${entry.latitude},${entry.longitude}&z=13&output=embed`;
+  const openStreetMapHref = `https://www.openstreetmap.org/?mlat=${entry.latitude}&mlon=${entry.longitude}#map=13/${entry.latitude}/${entry.longitude}`;
+
   return (
     <div className="space-y-14 pb-16 pt-8">
       <section className="editorial-shell">
@@ -137,22 +141,43 @@ export default async function EntryDetailPage({
                   <MapPinned className="mt-1 size-4 text-primary" />
                   <p className="text-sm leading-6 text-muted-foreground">{entry.address}</p>
                 </div>
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                  Coordinates: {entry.latitude.toFixed(4)}, {entry.longitude.toFixed(4)}
+                </p>
               </div>
-              <Button
-                render={
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${entry.latitude},${entry.longitude}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  />
-                }
-                className="velvet-button rounded-xl"
-              >
-                {entry.mapLabel}
-              </Button>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  render={
+                    <a href={googleMapsHref} target="_blank" rel="noreferrer" />
+                  }
+                  className="velvet-button rounded-xl"
+                >
+                  Open in Google Maps
+                </Button>
+                <Button
+                  render={
+                    <a href={openStreetMapHref} target="_blank" rel="noreferrer" />
+                  }
+                  variant="outline"
+                  className="rounded-xl"
+                >
+                  OpenStreetMap
+                </Button>
+              </div>
             </div>
           </Card>
-          <DetailMap latitude={entry.latitude} longitude={entry.longitude} label={entry.mapLabel} />
+          <div className="space-y-4">
+            <DetailMap latitude={entry.latitude} longitude={entry.longitude} label={entry.mapLabel} />
+            <div className="overflow-hidden rounded-[1.75rem] border border-border/60 bg-white/70">
+              <iframe
+                title={`Google Maps preview for ${entry.title}`}
+                src={googleMapsEmbedSrc}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="h-[320px] w-full"
+              />
+            </div>
+          </div>
         </div>
       </section>
     </div>

@@ -4,10 +4,12 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { eq, inArray } from "drizzle-orm";
+import { v2 as cloudinary } from "cloudinary";
 
 import { auth } from "@/lib/auth/auth";
 import { requireCmsSession } from "@/lib/auth/session";
 import { hasDatabase, getDb } from "@/lib/data/db";
+import { env, runtimeConfig } from "@/lib/env";
 import {
   categories,
   entries,
@@ -17,6 +19,7 @@ import {
   entryTranslations,
   homepageContent,
   homepageFeatureSlots,
+  mediaAssets,
   users,
 } from "@/lib/data/schema";
 import type { CmsRole } from "@/lib/auth/roles";
@@ -33,6 +36,12 @@ import {
 } from "@/lib/content/validators";
 import { locales } from "@/lib/i18n";
 
+cloudinary.config({
+  cloud_name: env.CLOUDINARY_CLOUD_NAME,
+  api_key: env.CLOUDINARY_API_KEY,
+  api_secret: env.CLOUDINARY_API_SECRET,
+});
+
 function assertDatabase() {
   if (!hasDatabase()) {
     throw new Error("Backend storage is not configured yet.");
@@ -48,6 +57,9 @@ function revalidateAllPublicPaths() {
   revalidatePath("/en/heritage");
   revalidatePath("/ka/heritage");
   revalidatePath("/ru/heritage");
+  revalidatePath("/en/destinations");
+  revalidatePath("/ka/destinations");
+  revalidatePath("/ru/destinations");
   revalidatePath("/en/vineyards");
   revalidatePath("/ka/vineyards");
   revalidatePath("/ru/vineyards");
@@ -213,6 +225,40 @@ export async function saveHomepageAction(payload: HomepageFormValues) {
     );
   }
 
+  revalidateAllPublicPaths();
+
+  return { success: true };
+}
+
+export async function deleteMediaAssetAction(assetId: string) {
+  await requireCmsSession();
+  const db = assertDatabase();
+  const [asset] = await db
+    .select({
+      id: mediaAssets.id,
+      publicId: mediaAssets.publicId,
+      secureUrl: mediaAssets.secureUrl,
+    })
+    .from(mediaAssets)
+    .where(eq(mediaAssets.id, assetId))
+    .limit(1);
+
+  if (!asset) {
+    throw new Error("Media asset not found.");
+  }
+
+  if (runtimeConfig.hasCloudinary && asset.secureUrl.includes("res.cloudinary.com")) {
+    try {
+      await cloudinary.uploader.destroy(asset.publicId, {
+        resource_type: "image",
+        invalidate: true,
+      });
+    } catch {
+      // Keep the CMS record removable even if the upstream asset has already disappeared.
+    }
+  }
+
+  await db.delete(mediaAssets).where(eq(mediaAssets.id, assetId));
   revalidateAllPublicPaths();
 
   return { success: true };
