@@ -1,0 +1,769 @@
+import { defaultLocale, emptyLocaleText } from "@/lib/i18n";
+import type {
+  CategoryRecord,
+  EntryRecord,
+  HomepageContentRecord,
+  HomepageFeatureSlotRecord,
+  MediaAssetRecord,
+  RegionRecord,
+  SiteSnapshot,
+} from "@/lib/content/types";
+
+const isoNow = "2026-03-26T00:00:00.000Z";
+
+const regions: RegionRecord[] = [
+  {
+    id: "region-kartli",
+    slug: "kartli",
+    name: {
+      en: "Kartli",
+      ka: "ქართლი",
+      ru: "Картли",
+    },
+    description: {
+      en: "Historic heartland of kingdoms, monasteries, and mountain ridges.",
+      ka: "სამეფოების, მონასტრებისა და მთების ისტორიული გული.",
+      ru: "Историческое сердце царств, монастырей и горных хребтов.",
+    },
+    orderIndex: 1,
+  },
+  {
+    id: "region-kakheti",
+    slug: "kakheti",
+    name: {
+      en: "Kakheti",
+      ka: "კახეთი",
+      ru: "Кахетия",
+    },
+    description: {
+      en: "Georgia’s wine country, shaped by cellars, terraces, and harvest ritual.",
+      ka: "საქართველოს ღვინის მხარე, სარდაფებითა და მოსავლის რიტუალებით.",
+      ru: "Винный регион Грузии с погребами, террасами и ритуалом сбора урожая.",
+    },
+    orderIndex: 2,
+  },
+  {
+    id: "region-svaneti",
+    slug: "svaneti",
+    name: {
+      en: "Svaneti",
+      ka: "სვანეთი",
+      ru: "Сванети",
+    },
+    description: {
+      en: "High mountain towers and alpine settlements at the edge of the Caucasus.",
+      ka: "მაღალი მთის კოშკები და ალპური სოფლები კავკასიონის კიდეზე.",
+      ru: "Высокогорные башни и альпийские поселения у края Кавказа.",
+    },
+    orderIndex: 3,
+  },
+  {
+    id: "region-samtskhe-javakheti",
+    slug: "samtskhe-javakheti",
+    name: {
+      en: "Samtskhe-Javakheti",
+      ka: "სამცხე-ჯავახეთი",
+      ru: "Самцхе-Джавахети",
+    },
+    description: {
+      en: "Cave cities, fortresses, and volcanic plateaus in southern Georgia.",
+      ka: "გამოქვაბულები, ციხეები და ვულკანური ზეგნები სამხრეთ საქართველოში.",
+      ru: "Пещерные города, крепости и вулканические плато юга Грузии.",
+    },
+    orderIndex: 4,
+  },
+];
+
+const categories: CategoryRecord[] = [
+  {
+    id: "cat-all-sites",
+    slug: "all-sites",
+    type: "heritage",
+    label: {
+      en: "All Sites",
+      ka: "ყველა ადგილი",
+      ru: "Все места",
+    },
+    orderIndex: 0,
+  },
+  {
+    id: "cat-monasteries",
+    slug: "monasteries",
+    type: "heritage",
+    label: {
+      en: "Monasteries",
+      ka: "მონასტრები",
+      ru: "Монастыри",
+    },
+    orderIndex: 1,
+  },
+  {
+    id: "cat-ancient-cities",
+    slug: "ancient-cities",
+    type: "heritage",
+    label: {
+      en: "Ancient Cities",
+      ka: "უძველესი ქალაქები",
+      ru: "Древние города",
+    },
+    orderIndex: 2,
+  },
+  {
+    id: "cat-fortresses",
+    slug: "fortresses",
+    type: "heritage",
+    label: {
+      en: "Fortresses",
+      ka: "ციხეები",
+      ru: "Крепости",
+    },
+    orderIndex: 3,
+  },
+  {
+    id: "cat-nature-reserves",
+    slug: "nature-reserves",
+    type: "heritage",
+    label: {
+      en: "Nature Reserves",
+      ka: "ნაკრძალები",
+      ru: "Заповедники",
+    },
+    orderIndex: 4,
+  },
+];
+
+const mediaAssets: MediaAssetRecord[] = [
+  {
+    id: "media-home-hero",
+    publicId: "sample/home-hero",
+    secureUrl:
+      "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1600&q=80",
+    width: 1600,
+    height: 1000,
+    alt: {
+      en: "Mountain panorama in Georgia",
+      ka: "საქართველოს მთების პანორამა",
+      ru: "Горная панорама Грузии",
+    },
+    kind: "photo",
+    createdAt: isoNow,
+  },
+  {
+    id: "media-vardzia",
+    publicId: "sample/vardzia",
+    secureUrl:
+      "https://images.unsplash.com/photo-1715595621488-6450fb770d2d?auto=format&fit=crop&w=1200&q=80",
+    width: 1200,
+    height: 900,
+    alt: emptyLocaleText("Vardzia Cave Monastery"),
+    kind: "photo",
+    createdAt: isoNow,
+  },
+  {
+    id: "media-gergeti",
+    publicId: "sample/gergeti",
+    secureUrl:
+      "https://images.unsplash.com/photo-1575731400875-6c2f1550b8db?auto=format&fit=crop&w=1200&q=80",
+    width: 1200,
+    height: 900,
+    alt: emptyLocaleText("Gergeti Trinity Church"),
+    kind: "photo",
+    createdAt: isoNow,
+  },
+  {
+    id: "media-ushguli",
+    publicId: "sample/ushguli",
+    secureUrl:
+      "https://images.unsplash.com/photo-1665302510594-2570d72a016f?auto=format&fit=crop&w=1200&q=80",
+    width: 1200,
+    height: 900,
+    alt: emptyLocaleText("Ushguli Towers"),
+    kind: "photo",
+    createdAt: isoNow,
+  },
+  {
+    id: "media-uplistsikhe",
+    publicId: "sample/uplistsikhe",
+    secureUrl:
+      "https://images.unsplash.com/photo-1689845061422-2d5c819e9395?auto=format&fit=crop&w=1200&q=80",
+    width: 1200,
+    height: 900,
+    alt: emptyLocaleText("Uplistsikhe Cave City"),
+    kind: "photo",
+    createdAt: isoNow,
+  },
+  {
+    id: "media-jvari",
+    publicId: "sample/jvari",
+    secureUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/6/6b/Jvari_Monastery%2C_Mtskheta%2C_Georgia.jpg",
+    width: 1400,
+    height: 933,
+    alt: emptyLocaleText("Jvari Monastery"),
+    kind: "photo",
+    createdAt: isoNow,
+  },
+  {
+    id: "media-vineyard",
+    publicId: "sample/vineyard",
+    secureUrl:
+      "https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?auto=format&fit=crop&w=1200&q=80",
+    width: 1200,
+    height: 900,
+    alt: emptyLocaleText("Historic vineyard vessel"),
+    kind: "photo",
+    createdAt: isoNow,
+  },
+  {
+    id: "media-polyphony",
+    publicId: "sample/polyphony",
+    secureUrl:
+      "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80",
+    width: 1200,
+    height: 900,
+    alt: emptyLocaleText("Polyphonic singing performance"),
+    kind: "photo",
+    createdAt: isoNow,
+  },
+  {
+    id: "media-supra",
+    publicId: "sample/supra",
+    secureUrl:
+      "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80",
+    width: 1200,
+    height: 900,
+    alt: emptyLocaleText("Traditional Georgian feast"),
+    kind: "photo",
+    createdAt: isoNow,
+  },
+  {
+    id: "media-artisans",
+    publicId: "sample/artisans",
+    secureUrl:
+      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
+    width: 1200,
+    height: 900,
+    alt: emptyLocaleText("Artisan workshop"),
+    kind: "photo",
+    createdAt: isoNow,
+  },
+];
+
+function entryTranslation(
+  title: string,
+  summary: string,
+  body: string,
+  extras?: Partial<EntryRecord["translations"][typeof defaultLocale]>,
+) {
+  const base = {
+    eyebrow: "UNESCO SITE",
+    title,
+    summary,
+    body,
+    seoTitle: title,
+    seoDescription: summary,
+    pullQuote:
+      "The architecture of Jvari expresses the balance between sacred proportion and the open sky above Mtskheta.",
+    journeyTitle: "Journey to the Peak",
+    journeySummary:
+      "Choose a scenic climb, a short private transfer, or a local marshrutka ride from central Mtskheta.",
+    locationLabel: "Location Information",
+    mapLabel: "Jvari Monastery",
+    ...extras,
+  };
+
+  return {
+    en: { locale: "en", ...base },
+    ka: { locale: "ka", ...base },
+    ru: { locale: "ru", ...base },
+  } as EntryRecord["translations"];
+}
+
+const entries: EntryRecord[] = [
+  {
+    id: "entry-vardzia",
+    type: "heritage",
+    slug: "vardzia-cave-monastery",
+    regionId: "region-samtskhe-javakheti",
+    heroMediaId: "media-vardzia",
+    categoryIds: ["cat-all-sites", "cat-ancient-cities"],
+    address: emptyLocaleText("Samtskhe-Javakheti"),
+    latitude: 41.3812,
+    longitude: 43.2846,
+    isPublished: true,
+    isFeatured: true,
+    sortOrder: 1,
+    createdAt: isoNow,
+    updatedAt: isoNow,
+    translations: entryTranslation(
+      "Vardzia Cave Monastery",
+      "A vast rock-hewn city and monastery carved along the cliffside of southern Georgia.",
+      "Vardzia is one of Georgia’s most cinematic historical complexes: a carved settlement, monastic center, and defensive refuge layered into the stone. Terraces, hidden chambers, and narrow passageways reveal how architecture responded directly to geology.",
+      { eyebrow: "UNESCO SITE" },
+    ),
+    highlights: [
+      {
+        id: "hl-vardzia-1",
+        sortOrder: 1,
+        title: emptyLocaleText("Monastic Chambers"),
+        description: emptyLocaleText("A network of cells, chapels, and tunnels carved into volcanic tuff."),
+      },
+    ],
+    transports: [],
+  },
+  {
+    id: "entry-gergeti",
+    type: "heritage",
+    slug: "gergeti-trinity-church",
+    regionId: "region-kartli",
+    heroMediaId: "media-gergeti",
+    categoryIds: ["cat-all-sites", "cat-monasteries"],
+    address: emptyLocaleText("Stepantsminda, Mtskheta-Mtianeti"),
+    latitude: 42.6625,
+    longitude: 44.6203,
+    isPublished: true,
+    isFeatured: true,
+    sortOrder: 2,
+    createdAt: isoNow,
+    updatedAt: isoNow,
+    translations: entryTranslation(
+      "Gergeti Trinity Church",
+      "A mountain church perched high above Stepantsminda with one of the most iconic views in the Caucasus.",
+      "Gergeti commands attention not through scale but through placement. The small church, framed by massive mountain walls, turns landscape itself into architecture.",
+      { eyebrow: "ALPINE MONASTERY" },
+    ),
+    highlights: [],
+    transports: [],
+  },
+  {
+    id: "entry-ushguli",
+    type: "heritage",
+    slug: "ushguli-towers",
+    regionId: "region-svaneti",
+    heroMediaId: "media-ushguli",
+    categoryIds: ["cat-all-sites", "cat-fortresses"],
+    address: emptyLocaleText("Ushguli, Svaneti"),
+    latitude: 42.9169,
+    longitude: 43.0116,
+    isPublished: true,
+    isFeatured: false,
+    sortOrder: 3,
+    createdAt: isoNow,
+    updatedAt: isoNow,
+    translations: entryTranslation(
+      "Ushguli Towers",
+      "Defensive towers and medieval homes in one of Europe’s highest inhabited communities.",
+      "In Ushguli, the silhouette of clustered towers is inseparable from daily life. The architecture reflects climate, conflict, and kinship all at once.",
+      { eyebrow: "MOUNTAIN DEFENSE" },
+    ),
+    highlights: [],
+    transports: [],
+  },
+  {
+    id: "entry-uplistsikhe",
+    type: "heritage",
+    slug: "uplistsikhe-cave-city",
+    regionId: "region-kartli",
+    heroMediaId: "media-uplistsikhe",
+    categoryIds: ["cat-all-sites", "cat-ancient-cities"],
+    address: emptyLocaleText("Shida Kartli"),
+    latitude: 41.9681,
+    longitude: 44.2077,
+    isPublished: true,
+    isFeatured: false,
+    sortOrder: 4,
+    createdAt: isoNow,
+    updatedAt: isoNow,
+    translations: entryTranslation(
+      "Uplistsikhe Cave City",
+      "An ancient urban complex where chambers, halls, and ceremonial spaces are cut directly into stone.",
+      "Uplistsikhe reveals a deep continuity between ritual, trade, and urban life. Circulation is carved into the site itself, creating a city that feels sculpted rather than built.",
+      { eyebrow: "ANCIENT CITY" },
+    ),
+    highlights: [],
+    transports: [],
+  },
+  {
+    id: "entry-jvari",
+    type: "heritage",
+    slug: "jvari-monastery",
+    regionId: "region-kartli",
+    heroMediaId: "media-jvari",
+    categoryIds: ["cat-all-sites", "cat-monasteries"],
+    address: {
+      en: "Mtskheta, above the confluence of the Mtkvari and Aragvi rivers",
+      ka: "მცხეთა, მტკვრისა და არაგვის შესართავის ზემოთ",
+      ru: "Мцхета, над слиянием Куры и Арагви",
+    },
+    latitude: 41.8385,
+    longitude: 44.7338,
+    isPublished: true,
+    isFeatured: true,
+    sortOrder: 5,
+    createdAt: isoNow,
+    updatedAt: isoNow,
+    translations: {
+      en: {
+        locale: "en",
+        eyebrow: "ARCHITECTURE OF SPIRIT",
+        title: "Jvari Monastery",
+        summary:
+          "A 6th-century masterpiece of Georgian Orthodox architecture standing where history meets the sky.",
+        body:
+          "Perched above ancient Mtskheta, Jvari Monastery is a landmark of Georgian architectural proportion. Its cross-domed form feels both elemental and exact, with a silhouette that appears to rise directly out of the ridge. The interior is compact and severe, while the exterior opens onto one of the most memorable panoramic views in the country.",
+        seoTitle: "Jvari Monastery | Kartli",
+        seoDescription:
+          "Discover Jvari Monastery, a 6th-century hilltop church above Mtskheta and one of Georgia’s defining sacred landmarks.",
+        pullQuote:
+          "The architecture of Jvari expresses the principle of early medieval Georgian church design: austerity outside, luminosity within.",
+        journeyTitle: "Journey to the Peak",
+        journeySummary:
+          "The monastery is located roughly 20 minutes from central Tbilisi and can be reached by transfer, marshrutka, or a walking ascent from Mtskheta.",
+        locationLabel: "Location Information",
+        mapLabel: "Jvari Monastery",
+      },
+      ka: {
+        locale: "ka",
+        eyebrow: "სულიერი არქიტექტურა",
+        title: "ჯვრის მონასტერი",
+        summary:
+          "VI საუკუნის ქართული საეკლესიო არქიტექტურის შედევრი, სადაც ისტორია ცას ერწყმის.",
+        body:
+          "ძველი მცხეთის ზემოთ აღმართული ჯვარი ქართული არქიტექტურული პროპორციების ერთ-ერთი ყველაზე სუფთა მაგალითია. მისი გუმბათოვანი ფორმა მკვეთრად ზის ქედზე და გარემოსთან ერთ მთლიანობად აღიქმება.",
+        seoTitle: "ჯვრის მონასტერი | Kartli",
+        seoDescription:
+          "აღმოაჩინე ჯვრის მონასტერი, VI საუკუნის ტაძარი მცხეთის ზემოთ და საქართველოს ერთ-ერთი მთავარი სიწმინდე.",
+        pullQuote:
+          "ჯვრის არქიტექტურა ადრეული შუა საუკუნეების ქართული ტაძრის მთავარ პრინციპს გამოხატავს: გარეთ სიმკაცრე, შიგნით სინათლე.",
+        journeyTitle: "გზა მწვერვალამდე",
+        journeySummary:
+          "მონასტერი თბილისიდან დაახლოებით 20 წუთის სავალზეა და მისვლა შესაძლებელია ტრანსფერით, მარშრუტკით ან ფეხით მცხეთიდან.",
+        locationLabel: "ლოკაციის ინფორმაცია",
+        mapLabel: "ჯვრის მონასტერი",
+      },
+      ru: {
+        locale: "ru",
+        eyebrow: "АРХИТЕКТУРА ДУХА",
+        title: "Монастырь Джвари",
+        summary:
+          "Шедевр грузинской православной архитектуры VI века, стоящий там, где история встречается с небом.",
+        body:
+          "Возвышаясь над древней Мцхетой, Джвари остаётся одним из самых чистых примеров грузинской архитектурной пропорции. Кресто-купольная форма монастыря выглядит как естественное продолжение хребта и открывает один из самых узнаваемых видов страны.",
+        seoTitle: "Монастырь Джвари | Kartli",
+        seoDescription:
+          "Откройте монастырь Джвари, храм VI века над Мцхетой и один из ключевых сакральных символов Грузии.",
+        pullQuote:
+          "Архитектура Джвари выражает главный принцип раннесредневекового грузинского храма: строгость снаружи и свет внутри.",
+        journeyTitle: "Путь к вершине",
+        journeySummary:
+          "До монастыря примерно 20 минут из Тбилиси. Сюда можно добраться трансфером, маршруткой или пешком из Мцхеты.",
+        locationLabel: "Информация о месте",
+        mapLabel: "Монастырь Джвари",
+      },
+    },
+    highlights: [
+      {
+        id: "hl-jvari-1",
+        sortOrder: 1,
+        title: {
+          en: "Terraced Entry Sequence",
+          ka: "ტერასული მისასვლელი",
+          ru: "Террасный подход",
+        },
+        description: {
+          en: "The approach compresses and then releases the view across the river valleys.",
+          ka: "მისასვლელი ჯერ კუმშავს, შემდეგ კი ხეობებზე ხედს შლის.",
+          ru: "Подход сначала сжимает пространство, а затем раскрывает вид на речные долины.",
+        },
+      },
+      {
+        id: "hl-jvari-2",
+        sortOrder: 2,
+        title: {
+          en: "External Reliefs",
+          ka: "გარე რელიეფები",
+          ru: "Внешние рельефы",
+        },
+        description: {
+          en: "Stone carving anchors the monument within both royal patronage and liturgical symbolism.",
+          ka: "ქვის კვეთა ძეგლს სამეფო პატრონაჟთან და ლიტურგიკულ სიმბოლიკასთან აკავშირებს.",
+          ru: "Каменная резьба связывает памятник с царским покровительством и литургической символикой.",
+        },
+      },
+      {
+        id: "hl-jvari-3",
+        sortOrder: 3,
+        title: {
+          en: "Ideal Viewpoint",
+          ka: "იდეალური ხედვის წერტილი",
+          ru: "Идеальная обзорная точка",
+        },
+        description: {
+          en: "From the plateau, Mtskheta and the meeting of the rivers read as one theatrical landscape.",
+          ka: "პლატოდან მცხეთა და მდინარეთა შესართავი ერთ სცენურ ხედად იკითხება.",
+          ru: "С плато Мцхета и слияние рек воспринимаются как единый сценический ландшафт.",
+        },
+      },
+    ],
+    transports: [
+      {
+        id: "tr-jvari-1",
+        mode: "transfer",
+        sortOrder: 1,
+        title: {
+          en: "Private Transport",
+          ka: "პირადი ტრანსპორტი",
+          ru: "Индивидуальный трансфер",
+        },
+        description: {
+          en: "Fastest option from Tbilisi or Mtskheta with a short final ascent to the viewpoint.",
+          ka: "ყველაზე სწრაფი გზა თბილისიდან ან მცხეთიდან მოკლე საბოლოო ასვლით.",
+          ru: "Самый быстрый вариант из Тбилиси или Мцхеты с коротким финальным подъёмом.",
+        },
+        ctaLabel: {
+          en: "Estimate Ride",
+          ka: "მგზავრობის ნახვა",
+          ru: "Посчитать поездку",
+        },
+        ctaHref: "#",
+      },
+      {
+        id: "tr-jvari-2",
+        mode: "bus",
+        sortOrder: 2,
+        title: {
+          en: "Public Marshrutka",
+          ka: "საზოგადოებრივი მარშრუტკა",
+          ru: "Маршрутка",
+        },
+        description: {
+          en: "Ride to Mtskheta first, then continue by local taxi or on foot toward the hill.",
+          ka: "ჯერ მიდი მცხეთამდე, შემდეგ კი გააგრძელე ადგილობრივი ტაქსით ან ფეხით.",
+          ru: "Сначала доезжайте до Мцхеты, затем поднимайтесь на такси или пешком.",
+        },
+        ctaLabel: {
+          en: "Travel Timetable",
+          ka: "განრიგის ნახვა",
+          ru: "Смотреть расписание",
+        },
+        ctaHref: "#",
+      },
+      {
+        id: "tr-jvari-3",
+        mode: "hike",
+        sortOrder: 3,
+        title: {
+          en: "Hiking Route",
+          ka: "საფეხმავლო მარშრუტი",
+          ru: "Пешеходный маршрут",
+        },
+        description: {
+          en: "A rewarding climb from the old town for visitors who want the landscape to unfold gradually.",
+          ka: "ლანდშაფტის თანდათან აღმოჩენისთვის ეს ამაღლება საუკეთესო არჩევანია.",
+          ru: "Подъём из старого города подойдёт тем, кто хочет, чтобы пейзаж раскрывался постепенно.",
+        },
+        ctaLabel: {
+          en: "Route & Difficulty",
+          ka: "მარშრუტი და სირთულე",
+          ru: "Маршрут и сложность",
+        },
+        ctaHref: "#",
+      },
+    ],
+  },
+  {
+    id: "entry-vineyard-kakheti",
+    type: "vineyard",
+    slug: "historic-vineyards-kakheti",
+    regionId: "region-kakheti",
+    heroMediaId: "media-vineyard",
+    categoryIds: [],
+    address: emptyLocaleText("Kakheti"),
+    latitude: 41.9193,
+    longitude: 45.4732,
+    isPublished: true,
+    isFeatured: true,
+    sortOrder: 6,
+    createdAt: isoNow,
+    updatedAt: isoNow,
+    translations: entryTranslation(
+      "Historic Vineyards",
+      "Editorial journeys through Kakheti’s qvevri cellars, terraced vines, and harvest rituals.",
+      "Georgia’s wine culture is inseparable from place: clay vessels, family courtyards, and long vineyard horizons. Our vineyard stories pair architecture, agriculture, and hospitality in one itinerary.",
+      { eyebrow: "8,000 YEARS OF WINE" },
+    ),
+    highlights: [],
+    transports: [],
+  },
+  {
+    id: "entry-polyphony",
+    type: "experience",
+    slug: "polyphonic-singing-evening",
+    regionId: "region-kartli",
+    heroMediaId: "media-polyphony",
+    categoryIds: [],
+    address: emptyLocaleText("Tbilisi"),
+    latitude: 41.7151,
+    longitude: 44.8271,
+    isPublished: true,
+    isFeatured: false,
+    sortOrder: 7,
+    createdAt: isoNow,
+    updatedAt: isoNow,
+    translations: entryTranslation(
+      "Polyphonic Singing & Dance",
+      "Evenings centered on voice, rhythm, and the collective force of Georgian polyphony.",
+      "Traditional music in Georgia is never only performance. It is an architecture of voices, memory, and social ritual, best experienced in intimate spaces with strong acoustics.",
+      { eyebrow: "LIVING TRADITION" },
+    ),
+    highlights: [],
+    transports: [],
+  },
+  {
+    id: "entry-supra",
+    type: "experience",
+    slug: "the-supra-feast",
+    regionId: "region-kartli",
+    heroMediaId: "media-supra",
+    categoryIds: [],
+    address: emptyLocaleText("Mtskheta"),
+    latitude: 41.8417,
+    longitude: 44.7191,
+    isPublished: true,
+    isFeatured: false,
+    sortOrder: 8,
+    createdAt: isoNow,
+    updatedAt: isoNow,
+    translations: entryTranslation(
+      "The Supra Feast",
+      "Join a table where hospitality, toasts, and regional food become one narrative experience.",
+      "The supra is not a meal alone. It is pacing, speech, music, and ceremony arranged around a long shared table.",
+      { eyebrow: "TABLE RITUAL" },
+    ),
+    highlights: [],
+    transports: [],
+  },
+  {
+    id: "entry-artisans",
+    type: "experience",
+    slug: "blue-tablecloth-workshop",
+    regionId: "region-kartli",
+    heroMediaId: "media-artisans",
+    categoryIds: [],
+    address: emptyLocaleText("Tbilisi"),
+    latitude: 41.6938,
+    longitude: 44.8015,
+    isPublished: true,
+    isFeatured: false,
+    sortOrder: 9,
+    createdAt: isoNow,
+    updatedAt: isoNow,
+    translations: entryTranslation(
+      "Blue Tablecloth Workshop",
+      "Hands-on sessions with artisans preserving one of Georgia’s most recognizable textile traditions.",
+      "Pattern, pigment, and repeat are at the center of blue tablecloth making. Workshops reveal the patience behind a familiar object of Georgian domestic culture.",
+      { eyebrow: "CRAFT & COLOR" },
+    ),
+    highlights: [],
+    transports: [],
+  },
+];
+
+const homepage: HomepageContentRecord = {
+  id: "homepage-main",
+  key: "main",
+  heroKicker: {
+    en: "THIS SEASON’S CURATED LOOP",
+    ka: "ამ სეზონის კურირებული მარშრუტი",
+    ru: "КУРАТОРСКИЙ МАРШРУТ СЕЗОНА",
+  },
+  heroLead: {
+    en: "Discover",
+    ka: "აღმოაჩინე",
+    ru: "Откройте",
+  },
+  heroAccent: {
+    en: "Soulful Georgia",
+    ka: "სულიერი საქართველო",
+    ru: "душу Грузии",
+  },
+  heroDescription: {
+    en: "Image-led routes through monasteries, wine valleys, and cultural rituals across the Republic of Georgia.",
+    ka: "მონასტრების, ღვინის ხეობებისა და კულტურული რიტუალების სურათებით მდიდარი მარშრუტები საქართველოში.",
+    ru: "Маршруты по монастырям, винным долинам и культурным ритуалам по всей Грузии.",
+  },
+  primaryCtaLabel: {
+    en: "Explore Collection",
+    ka: "კოლექციის ნახვა",
+    ru: "Открыть коллекцию",
+  },
+  secondaryCtaLabel: {
+    en: "Discover Now",
+    ka: "აღმოაჩინე",
+    ru: "Смотреть",
+  },
+  newsletterTitle: {
+    en: "Stay in the loop.",
+    ka: "იყავი კავშირზე.",
+    ru: "Оставайтесь на связи.",
+  },
+  newsletterDescription: {
+    en: "A monthly note with restored sites, seasonal routes, and cultural dispatches from Georgia.",
+    ka: "ყოველთვიური წერილი აღდგენილი ძეგლებით, სეზონური გზებითა და კულტურული ამბებით საქართველოდან.",
+    ru: "Ежемесячное письмо о восстановленных памятниках, сезонных маршрутах и культурных событиях Грузии.",
+  },
+};
+
+const homepageSlots: HomepageFeatureSlotRecord[] = [
+  {
+    id: "slot-home-1",
+    slotKey: "must-see-1",
+    entryId: "entry-vardzia",
+    sortOrder: 1,
+  },
+  {
+    id: "slot-home-2",
+    slotKey: "must-see-2",
+    entryId: "entry-jvari",
+    sortOrder: 2,
+  },
+  {
+    id: "slot-home-3",
+    slotKey: "must-see-3",
+    entryId: "entry-ushguli",
+    sortOrder: 3,
+  },
+  {
+    id: "slot-home-4",
+    slotKey: "featured-vineyard",
+    entryId: "entry-vineyard-kakheti",
+    sortOrder: 4,
+  },
+  {
+    id: "slot-home-5",
+    slotKey: "experience-1",
+    entryId: "entry-polyphony",
+    sortOrder: 5,
+  },
+  {
+    id: "slot-home-6",
+    slotKey: "experience-2",
+    entryId: "entry-supra",
+    sortOrder: 6,
+  },
+  {
+    id: "slot-home-7",
+    slotKey: "experience-3",
+    entryId: "entry-artisans",
+    sortOrder: 7,
+  },
+];
+
+export const sampleSiteSnapshot: SiteSnapshot = {
+  regions,
+  categories,
+  mediaAssets,
+  entries,
+  homepage,
+  homepageSlots,
+};
