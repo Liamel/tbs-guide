@@ -184,7 +184,7 @@ export function CmsHotkeys({ canManageUsers }: { canManageUsers: boolean }) {
       </CommandDialog>
 
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
-        <DialogContent className="glass-panel-strong max-w-lg border-0">
+        <DialogContent className="cms-surface max-w-xl border-0 p-6">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <HelpCircle className="size-4 text-primary" />
@@ -209,13 +209,16 @@ export function CmsHotkeys({ canManageUsers }: { canManageUsers: boolean }) {
               ["Ctrl/Cmd + S", "Save current editor"],
               ["Esc", "Close overlays"],
             ].map(([shortcut, description]) => (
-              <div key={shortcut} className="flex items-center justify-between gap-4 rounded-2xl bg-white/60 px-4 py-3">
+              <div
+                key={shortcut}
+                className="cms-surface-subtle flex items-center justify-between gap-4 rounded-2xl px-4 py-3"
+              >
                 <span className="font-mono text-xs text-primary">{shortcut}</span>
                 <span className="text-sm text-muted-foreground">{description}</span>
               </div>
             ))}
           </div>
-          <div className="rounded-2xl bg-muted px-4 py-3 text-xs text-muted-foreground">
+          <div className="cms-surface-subtle rounded-2xl px-4 py-3 text-xs text-muted-foreground">
             Current route: <span className="font-mono text-foreground">{pathname}</span>
           </div>
         </DialogContent>

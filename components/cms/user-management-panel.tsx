@@ -11,7 +11,6 @@ import {
   resetCmsUserPasswordAction,
 } from "@/app/CMS/actions";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -20,8 +19,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  CmsField,
+  CmsSection,
+  CmsStatusBadge,
+  cmsControlClassName,
+} from "@/components/cms/cms-ui";
 import type { CmsUserRecord } from "@/lib/content/types";
 
 export function UserManagementPanel({ users }: { users: CmsUserRecord[] }) {
@@ -40,9 +44,13 @@ export function UserManagementPanel({ users }: { users: CmsUserRecord[] }) {
   return (
     <>
       <div className="space-y-6">
-        <Card className="glass-panel-strong border-0 p-0 ring-0">
+        <CmsSection
+          eyebrow="Owner Controls"
+          title="Create moderator account"
+          description="Use this form when someone needs editorial access to create, edit, or publish content."
+        >
           <form
-            className="grid gap-4 px-6 py-6 lg:grid-cols-2"
+            className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]"
             onSubmit={(event) => {
               event.preventDefault();
 
@@ -66,89 +74,102 @@ export function UserManagementPanel({ users }: { users: CmsUserRecord[] }) {
               });
             }}
           >
-            <div className="space-y-2">
-              <p className="eyebrow">Owner Controls</p>
-              <h2 className="font-heading text-3xl">Moderator access</h2>
-              <p className="text-sm leading-6 text-muted-foreground">
-                Only the owner can add or remove moderator accounts for the CMS.
-              </p>
+            <div className="cms-surface-subtle rounded-[1.5rem] p-5">
+              <p className="cms-kicker">Access notes</p>
+              <h3 className="mt-2 font-heading text-xl text-foreground">Before you create an account</h3>
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
+                <li>Usernames should stay lowercase and use letters, numbers, or underscores only.</li>
+                <li>Passwords need at least eight characters.</li>
+                <li>Add email when available so the account is easier to identify later.</li>
+              </ul>
             </div>
+
             <div className="grid gap-4">
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Name</Label>
+              <div className="grid gap-4 md:grid-cols-2">
+                <CmsField label="Name" hint="Full name shown in the CMS.">
                   <Input
                     value={form.name}
                     onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-                    className="h-11 rounded-2xl"
+                    className={cmsControlClassName}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label>Username</Label>
+                </CmsField>
+                <CmsField label="Username" hint="Lowercase login name used during sign-in.">
                   <Input
                     value={form.username}
                     onChange={(event) => setForm((current) => ({ ...current, username: event.target.value }))}
-                    className="h-11 rounded-2xl"
+                    className={cmsControlClassName}
                   />
-                </div>
+                </CmsField>
               </div>
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Password</Label>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <CmsField label="Password" hint="Temporary password for the new moderator.">
                   <Input
                     type="password"
                     value={form.password}
                     onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
-                    className="h-11 rounded-2xl"
+                    className={cmsControlClassName}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label>Email (optional)</Label>
+                </CmsField>
+                <CmsField label="Email" hint="Optional, but useful for identifying the account later.">
                   <Input
                     type="email"
                     value={form.email}
                     onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-                    className="h-11 rounded-2xl"
+                    className={cmsControlClassName}
                   />
-                </div>
+                </CmsField>
               </div>
-              <Button type="submit" className="velvet-button rounded-xl" disabled={pending}>
-                {pending ? "Creating..." : "Create Moderator"}
-              </Button>
+
+              <div className="flex justify-end">
+                <Button type="submit" className="cms-primary-button h-11 rounded-xl" disabled={pending}>
+                  {pending ? "Creating..." : "Create Moderator"}
+                </Button>
+              </div>
             </div>
           </form>
-        </Card>
+        </CmsSection>
 
-        <Card className="glass-panel border-0 p-0 ring-0">
-          <div className="px-4 py-4">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Username</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead />
+        <CmsSection
+          eyebrow="Team Access"
+          title="Current users"
+          description="Owners can reset moderator passwords or remove moderator access at any time."
+        >
+          <div className="overflow-hidden rounded-[1.5rem] border border-border/70 bg-white">
+            <Table className="min-w-[720px]">
+              <TableHeader className="bg-muted/35">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="px-4">User</TableHead>
+                  <TableHead className="px-4">Username</TableHead>
+                  <TableHead className="px-4">Role</TableHead>
+                  <TableHead className="px-4">Created</TableHead>
+                  <TableHead className="px-4 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-heading">{user.name}</p>
+                  <TableRow key={user.id} className="hover:bg-muted/25">
+                    <TableCell className="px-4 py-4 align-top whitespace-normal">
+                      <div className="space-y-1">
+                        <p className="font-heading text-lg text-foreground">{user.name}</p>
                         <p className="text-sm text-muted-foreground">{user.email}</p>
                       </div>
                     </TableCell>
-                    <TableCell>@{user.username}</TableCell>
-                    <TableCell className="capitalize">{user.role}</TableCell>
-                    <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
+                    <TableCell className="px-4 py-4 align-top">@{user.username}</TableCell>
+                    <TableCell className="px-4 py-4 align-top">
+                      <CmsStatusBadge tone={user.role === "owner" ? "accent" : "neutral"}>
+                        {user.role}
+                      </CmsStatusBadge>
+                    </TableCell>
+                    <TableCell className="px-4 py-4 align-top">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-right align-top">
                       {user.role === "owner" ? null : (
                         <div className="flex justify-end gap-2">
                           <Button
                             variant="outline"
-                            className="rounded-full"
+                            className="rounded-xl bg-white/90"
                             onClick={() => {
                               setResetTarget(user);
                               setResetPassword("");
@@ -183,11 +204,11 @@ export function UserManagementPanel({ users }: { users: CmsUserRecord[] }) {
               </TableBody>
             </Table>
           </div>
-        </Card>
+        </CmsSection>
       </div>
 
       <Dialog open={Boolean(resetTarget)} onOpenChange={(open) => !open && setResetTarget(null)}>
-        <DialogContent className="glass-panel-strong max-w-md border-0">
+        <DialogContent className="cms-surface max-w-md border-0 p-6">
           <DialogHeader>
             <DialogTitle>Reset moderator password</DialogTitle>
             <DialogDescription>
@@ -221,18 +242,21 @@ export function UserManagementPanel({ users }: { users: CmsUserRecord[] }) {
               });
             }}
           >
-            <div className="space-y-2">
-              <Label htmlFor="reset-password">New Password</Label>
+            <CmsField
+              label="New Password"
+              hint="Choose a new password with at least eight characters."
+              htmlFor="reset-password"
+            >
               <Input
                 id="reset-password"
                 type="password"
                 value={resetPassword}
                 onChange={(event) => setResetPassword(event.target.value)}
                 minLength={8}
-                className="h-11 rounded-2xl"
+                className={cmsControlClassName}
               />
-            </div>
-            <Button type="submit" className="velvet-button w-full rounded-xl" disabled={resetPending}>
+            </CmsField>
+            <Button type="submit" className="cms-primary-button h-11 w-full rounded-xl" disabled={resetPending}>
               {resetPending ? "Saving..." : "Update Password"}
             </Button>
           </form>

@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  CmsField,
+  CmsSection,
+  cmsControlClassName,
+} from "@/components/cms/cms-ui";
 import { authClient } from "@/lib/auth/client";
 import { getDictionary } from "@/lib/i18n";
 
@@ -19,9 +22,13 @@ export function CmsLoginForm({ disabled }: { disabled: boolean }) {
   const [pending, setPending] = useState(false);
 
   return (
-    <Card className="glass-panel-strong border-0 p-0 ring-0">
+    <CmsSection
+      eyebrow={dict.cms.title}
+      title={dict.cms.signInTitle}
+      description={disabled ? dict.cms.setupRequiredDescription : dict.cms.signInDescription}
+    >
       <form
-        className="space-y-5 px-6 py-6"
+        className="space-y-5"
         onSubmit={(event) => {
           event.preventDefault();
 
@@ -53,26 +60,27 @@ export function CmsLoginForm({ disabled }: { disabled: boolean }) {
           });
         }}
       >
-        <div className="space-y-1">
-          <p className="eyebrow">{dict.cms.title}</p>
-          <h2 className="font-heading text-3xl">{dict.cms.signInTitle}</h2>
-          <p className="text-sm leading-6 text-muted-foreground">
-            {disabled ? dict.cms.setupRequiredDescription : dict.cms.signInDescription}
-          </p>
-        </div>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="cms-username">{dict.cms.username}</Label>
+          <CmsField
+            label={dict.cms.username}
+            hint="Use the CMS username assigned to your admin account."
+            htmlFor="cms-username"
+          >
             <Input
               id="cms-username"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
               disabled={pending || disabled}
               autoComplete="username"
+              className={cmsControlClassName}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="cms-password">{dict.cms.password}</Label>
+          </CmsField>
+
+          <CmsField
+            label={dict.cms.password}
+            hint="Passwords are case-sensitive and required on every sign-in."
+            htmlFor="cms-password"
+          >
             <Input
               id="cms-password"
               type="password"
@@ -80,13 +88,19 @@ export function CmsLoginForm({ disabled }: { disabled: boolean }) {
               onChange={(event) => setPassword(event.target.value)}
               disabled={pending || disabled}
               autoComplete="current-password"
+              className={cmsControlClassName}
             />
-          </div>
+          </CmsField>
         </div>
-        <Button type="submit" className="velvet-button w-full rounded-xl" disabled={pending || disabled}>
+
+        <Button
+          type="submit"
+          className="cms-primary-button h-11 w-full rounded-xl"
+          disabled={pending || disabled}
+        >
           {pending ? "Signing in..." : dict.cms.signInTitle}
         </Button>
       </form>
-    </Card>
+    </CmsSection>
   );
 }

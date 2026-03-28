@@ -6,9 +6,7 @@ import { toast } from "sonner";
 
 import { saveHomepageAction } from "@/app/CMS/actions";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -17,25 +15,99 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  CmsField,
+  CmsSection,
+  cmsControlClassName,
+  cmsSelectTriggerClassName,
+  cmsTextareaClassName,
+} from "@/components/cms/cms-ui";
 import type { EntryRecord, HomepageContentRecord, HomepageFeatureSlotRecord } from "@/lib/content/types";
 import { homepageFormSchema, type HomepageFormValues } from "@/lib/content/validators";
-import { locales } from "@/lib/i18n";
+import { localeLabels, locales, type Locale } from "@/lib/i18n";
 
 const localizedHomepageFields = [
-  ["heroKicker", "Hero Kicker"],
-  ["heroLead", "Hero Lead"],
-  ["heroAccent", "Hero Accent"],
-  ["heroDescription", "Hero Description"],
-  ["primaryCtaLabel", "Primary CTA"],
-  ["secondaryCtaLabel", "Secondary CTA"],
-  ["newsletterTitle", "Newsletter Title"],
-  ["newsletterDescription", "Newsletter Description"],
-] as const satisfies ReadonlyArray<
-  readonly [
-    Exclude<keyof HomepageFormValues, "key" | "featuredSlots">,
-    string,
-  ]
->;
+  {
+    key: "heroKicker",
+    label: "Hero Kicker",
+    hint: "Small label above the homepage headline.",
+    kind: "input",
+  },
+  {
+    key: "heroLead",
+    label: "Hero Lead",
+    hint: "Main homepage headline.",
+    kind: "input",
+  },
+  {
+    key: "heroAccent",
+    label: "Hero Accent",
+    hint: "Highlighted word or phrase paired with the hero lead.",
+    kind: "input",
+  },
+  {
+    key: "heroDescription",
+    label: "Hero Description",
+    hint: "Supporting sentence under the homepage headline.",
+    kind: "textarea",
+  },
+  {
+    key: "primaryCtaLabel",
+    label: "Primary CTA",
+    hint: "Main hero button label.",
+    kind: "input",
+  },
+  {
+    key: "secondaryCtaLabel",
+    label: "Secondary CTA",
+    hint: "Secondary hero button label.",
+    kind: "input",
+  },
+  {
+    key: "newsletterTitle",
+    label: "Newsletter Title",
+    hint: "Headline above the newsletter signup section.",
+    kind: "input",
+  },
+  {
+    key: "newsletterDescription",
+    label: "Newsletter Description",
+    hint: "Supporting text above the newsletter form.",
+    kind: "textarea",
+  },
+] as const satisfies ReadonlyArray<{
+  key: Exclude<keyof HomepageFormValues, "key" | "featuredSlots">;
+  label: string;
+  hint: string;
+  kind: "input" | "textarea";
+}>;
+
+const homepageSlotGroups = [
+  {
+    title: "Must-see cards",
+    description: "Three featured cards near the top of the homepage.",
+    slots: [
+      { key: "must-see-1", label: "Must-see card 1" },
+      { key: "must-see-2", label: "Must-see card 2" },
+      { key: "must-see-3", label: "Must-see card 3" },
+    ],
+  },
+  {
+    title: "Featured vineyard",
+    description: "Large spotlight section for a single vineyard.",
+    slots: [{ key: "featured-vineyard", label: "Featured vineyard" }],
+  },
+  {
+    title: "Experience cards",
+    description: "Three cards shown in the experiences section.",
+    slots: [
+      { key: "experience-1", label: "Experience card 1" },
+      { key: "experience-2", label: "Experience card 2" },
+      { key: "experience-3", label: "Experience card 3" },
+    ],
+  },
+] as const;
 
 function buildInitialValue(
   homepage: HomepageContentRecord,
@@ -60,10 +132,40 @@ export function HomepageEditor({
   const [value, setValue] = useState(() => buildInitialValue(homepage, slots));
   const [pending, setPending] = useState(false);
 
+  function updateLocaleField(
+    field: Exclude<keyof HomepageFormValues, "key" | "featuredSlots">,
+    locale: Locale,
+    nextValue: string,
+  ) {
+    setValue((current) => ({
+      ...current,
+      [field]: {
+        ...current[field],
+        [locale]: nextValue,
+      },
+    }));
+  }
+
   return (
-    <Card className="glass-panel-strong border-0 p-0 ring-0">
+    <CmsSection
+      eyebrow="Homepage"
+      title="Homepage content"
+      description="Edit the homepage headline, newsletter copy, and featured entry placements without touching the public layout."
+      action={
+        <Button
+          type="submit"
+          form="cms-homepage-form"
+          data-cms-save="true"
+          className="cms-primary-button h-11 rounded-xl"
+          disabled={pending}
+        >
+          {pending ? "Saving..." : "Save Homepage"}
+        </Button>
+      }
+    >
       <form
-        className="space-y-6 px-6 py-6"
+        id="cms-homepage-form"
+        className="space-y-6"
         onSubmit={(event) => {
           event.preventDefault();
 
@@ -81,91 +183,142 @@ export function HomepageEditor({
           });
         }}
       >
-        <div className="space-y-2">
-          <p className="eyebrow">Homepage Story</p>
-          <h2 className="font-heading text-3xl">Hero and feature slots</h2>
-          <p className="text-sm leading-6 text-muted-foreground">
-            Control the hero copy, newsletter block, and the featured cards shown on the public home page.
-          </p>
-        </div>
-
-        <Tabs defaultValue="en">
-          <TabsList>
+        <Tabs defaultValue="en" className="gap-5">
+          <TabsList className="grid h-auto w-full gap-2 rounded-none bg-transparent p-0 sm:grid-cols-3">
             {locales.map((locale) => (
-              <TabsTrigger key={locale} value={locale}>
-                {locale.toUpperCase()}
+              <TabsTrigger
+                key={locale}
+                value={locale}
+                className="cms-surface-subtle h-auto w-full justify-start rounded-[1rem] px-4 py-3 text-left data-active:bg-white data-active:text-foreground"
+              >
+                <div className="space-y-1">
+                  <div className="font-medium text-foreground">{localeLabels[locale]}</div>
+                  <div className="text-xs text-muted-foreground">Homepage copy for this locale</div>
+                </div>
               </TabsTrigger>
             ))}
           </TabsList>
+
           {locales.map((locale) => (
-            <TabsContent key={locale} value={locale}>
-              <div className="grid gap-4 lg:grid-cols-2">
-                {localizedHomepageFields.map(([field, label]) => (
-                  <div key={`${locale}-${field}`} className="space-y-2">
-                    <Label>{label}</Label>
-                    <Input
-                      value={value[field][locale]}
-                      onChange={(event) =>
-                        setValue((current) => ({
-                          ...current,
-                          [field]: {
-                            ...current[field],
-                            [locale]: event.target.value,
-                          },
-                        }))
-                      }
-                      className="h-11 rounded-2xl"
-                    />
-                  </div>
-                ))}
+            <TabsContent key={locale} value={locale} className="space-y-4">
+              <div className="cms-surface-subtle rounded-[1.5rem] p-5">
+                <div className="space-y-2">
+                  <p className="cms-kicker">{localeLabels[locale]}</p>
+                  <h3 className="font-heading text-xl text-foreground">Hero copy</h3>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    These fields fill the hero headline, supporting copy, and CTA buttons at the top of the homepage.
+                  </p>
+                </div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  {localizedHomepageFields.slice(0, 6).map((field) => (
+                    <CmsField
+                      key={`${locale}-${field.key}`}
+                      label={field.label}
+                      hint={field.hint}
+                      className={field.kind === "textarea" ? "md:col-span-2" : undefined}
+                    >
+                      {field.kind === "textarea" ? (
+                        <Textarea
+                          value={value[field.key][locale]}
+                          onChange={(event) => updateLocaleField(field.key, locale, event.target.value)}
+                          className={cmsTextareaClassName}
+                        />
+                      ) : (
+                        <Input
+                          value={value[field.key][locale]}
+                          onChange={(event) => updateLocaleField(field.key, locale, event.target.value)}
+                          className={cmsControlClassName}
+                        />
+                      )}
+                    </CmsField>
+                  ))}
+                </div>
+              </div>
+
+              <div className="cms-surface-subtle rounded-[1.5rem] p-5">
+                <div className="space-y-2">
+                  <p className="cms-kicker">Newsletter section</p>
+                  <h3 className="font-heading text-xl text-foreground">Newsletter copy</h3>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    This text sits above the newsletter signup form near the bottom of the homepage.
+                  </p>
+                </div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  {localizedHomepageFields.slice(6).map((field) => (
+                    <CmsField
+                      key={`${locale}-${field.key}`}
+                      label={field.label}
+                      hint={field.hint}
+                      className={field.kind === "textarea" ? "md:col-span-2" : undefined}
+                    >
+                      {field.kind === "textarea" ? (
+                        <Textarea
+                          value={value[field.key][locale]}
+                          onChange={(event) => updateLocaleField(field.key, locale, event.target.value)}
+                          className={cmsTextareaClassName}
+                        />
+                      ) : (
+                        <Input
+                          value={value[field.key][locale]}
+                          onChange={(event) => updateLocaleField(field.key, locale, event.target.value)}
+                          className={cmsControlClassName}
+                        />
+                      )}
+                    </CmsField>
+                  ))}
+                </div>
               </div>
             </TabsContent>
           ))}
         </Tabs>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[
-            "must-see-1",
-            "must-see-2",
-            "must-see-3",
-            "featured-vineyard",
-            "experience-1",
-            "experience-2",
-            "experience-3",
-          ].map((slotKey) => (
-            <div key={slotKey} className="space-y-2">
-              <Label className="capitalize">{slotKey.replaceAll("-", " ")}</Label>
-              <Select
-                value={value.featuredSlots[slotKey]}
-                onValueChange={(selected) =>
-                  setValue((current) => ({
-                    ...current,
-                    featuredSlots: {
-                      ...current.featuredSlots,
-                      [slotKey]: selected || current.featuredSlots[slotKey],
-                    },
-                  }))
-                }
-              >
-                <SelectTrigger className="h-11 w-full rounded-2xl">
-                  <SelectValue placeholder="Select entry" />
-                </SelectTrigger>
-                <SelectContent>
-                  {entries.map((entry) => (
-                    <SelectItem key={entry.id} value={entry.id}>
-                      {entry.translations.en.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        <div className="grid gap-4">
+          {homepageSlotGroups.map((group) => (
+            <div key={group.title} className="cms-surface-subtle rounded-[1.5rem] p-5">
+              <div className="space-y-2">
+                <p className="cms-kicker">Homepage placement</p>
+                <h3 className="font-heading text-xl text-foreground">{group.title}</h3>
+                <p className="text-sm leading-6 text-muted-foreground">{group.description}</p>
+              </div>
+              <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {group.slots.map((slot) => (
+                  <CmsField key={slot.key} label={slot.label} hint="Choose the entry shown in this homepage slot.">
+                    <Select
+                      value={value.featuredSlots[slot.key]}
+                      onValueChange={(selected) =>
+                        setValue((current) => ({
+                          ...current,
+                          featuredSlots: {
+                            ...current.featuredSlots,
+                            [slot.key]: selected || current.featuredSlots[slot.key],
+                          },
+                        }))
+                      }
+                    >
+                      <SelectTrigger className={cmsSelectTriggerClassName}>
+                        <SelectValue placeholder="Select entry" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {entries.map((entry) => (
+                          <SelectItem key={entry.id} value={entry.id}>
+                            {entry.translations.en.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </CmsField>
+                ))}
+              </div>
             </div>
           ))}
         </div>
 
-        <Button type="submit" data-cms-save="true" className="velvet-button rounded-xl" disabled={pending}>
-          {pending ? "Saving..." : "Save Homepage"}
-        </Button>
+        <div className="flex justify-end">
+          <Button type="submit" className="cms-primary-button h-11 rounded-xl" disabled={pending}>
+            {pending ? "Saving..." : "Save Homepage"}
+          </Button>
+        </div>
       </form>
-    </Card>
+    </CmsSection>
   );
 }

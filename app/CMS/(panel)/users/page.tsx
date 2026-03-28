@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 
+import { CmsPageHeader, CmsStatusBadge } from "@/components/cms/cms-ui";
 import { UserManagementPanel } from "@/components/cms/user-management-panel";
 import { auth } from "@/lib/auth/auth";
 import { requireCmsSession } from "@/lib/auth/session";
@@ -41,5 +42,22 @@ export default async function CmsUsersPage() {
     };
   });
 
-  return <UserManagementPanel users={users} />;
+  return (
+    <div className="space-y-6">
+      <CmsPageHeader
+        eyebrow="Access Control"
+        title="Users"
+        description="Owners can create moderator accounts, reset passwords, and remove access when a team member no longer needs the CMS."
+        meta={
+          <>
+            <CmsStatusBadge tone="accent">{users.length} total users</CmsStatusBadge>
+            <CmsStatusBadge tone="neutral">
+              {users.filter((user) => user.role === "moderator").length} moderators
+            </CmsStatusBadge>
+          </>
+        }
+      />
+      <UserManagementPanel users={users} />
+    </div>
+  );
 }
