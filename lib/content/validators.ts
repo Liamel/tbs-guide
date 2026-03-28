@@ -78,6 +78,39 @@ export const homepageFormSchema = z.object({
 
 export type HomepageFormValues = z.infer<typeof homepageFormSchema>;
 
+export const regionFormSchema = z.object({
+  id: z.string().optional(),
+  slug: z.string().min(2),
+  orderIndex: z.number().int().min(0).default(0),
+  name: localeTextSchema,
+  description: localeTextSchema,
+});
+
+export const regionsFormSchema = z
+  .object({
+    regions: z.array(regionFormSchema),
+  })
+  .superRefine((value, ctx) => {
+    const seenSlugs = new Set<string>();
+
+    value.regions.forEach((region, index) => {
+      const normalizedSlug = region.slug.trim().toLowerCase();
+      if (seenSlugs.has(normalizedSlug)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["regions", index, "slug"],
+          message: "Each region slug must be unique.",
+        });
+        return;
+      }
+
+      seenSlugs.add(normalizedSlug);
+    });
+  });
+
+export type RegionFormValues = z.infer<typeof regionFormSchema>;
+export type RegionsFormValues = z.infer<typeof regionsFormSchema>;
+
 export const cmsUserCreateSchema = z.object({
   name: z.string().min(2),
   username: z
@@ -160,5 +193,22 @@ export function createEmptyEntryDraft(): EntryFormValues {
     },
     highlights: [],
     transports: [],
+  };
+}
+
+export function createEmptyRegionDraft(orderIndex = 0): RegionFormValues {
+  return {
+    slug: "",
+    orderIndex,
+    name: {
+      en: "",
+      ka: "",
+      ru: "",
+    },
+    description: {
+      en: "",
+      ka: "",
+      ru: "",
+    },
   };
 }

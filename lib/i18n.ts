@@ -88,6 +88,21 @@ type Dictionary = {
     experiencesLabel: string;
     newsletterTitle: string;
     newsletterDescription: string;
+    regionsMapEyebrow: string;
+    regionsMapTitle: string;
+    regionsMapDescription: string;
+    regionsMapHint: string;
+    regionsLiveLabel: string;
+    storiesLiveLabel: string;
+  };
+  region: {
+    eyebrow: string;
+    offeringsTitle: string;
+    featuredStories: string;
+    exploreRegion: string;
+    browseDestinations: string;
+    publishedStories: string;
+    noStories: string;
   };
   listing: {
     heritageKicker: string;
@@ -150,7 +165,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     cta: {
       planTrip: "Plan Trip",
-      exploreCollection: "Explore Collection",
+      exploreCollection: "Explore Collections",
       readMore: "Read More",
       discoverNow: "Discover Now",
       viewMap: "Explore Map",
@@ -169,6 +184,23 @@ const dictionaries: Record<Locale, Dictionary> = {
       newsletterTitle: "Stay in the loop.",
       newsletterDescription:
         "Get seasonal itineraries, newly restored sites, and curatorial notes from across Georgia.",
+      regionsMapEyebrow: "Interactive Region Map",
+      regionsMapTitle: "Hover the map, then step into a dedicated regional story.",
+      regionsMapDescription:
+        "Each region starts in grayscale. Move across the map to reveal its original color, preview its strongest stories, and click through to the full regional page.",
+      regionsMapHint: "Hover to preview a region. Click to open its dedicated page.",
+      regionsLiveLabel: "Regions live",
+      storiesLiveLabel: "Stories live",
+    },
+    region: {
+      eyebrow: "Regional Profile",
+      offeringsTitle: "What this region offers",
+      featuredStories: "Featured stories",
+      exploreRegion: "Explore Region",
+      browseDestinations: "Browse Destinations",
+      publishedStories: "Published stories",
+      noStories:
+        "Stories for this region are being curated now. Add entries in the CMS to bring this page to life.",
     },
     listing: {
       heritageKicker: "Curated Heritage",
@@ -252,6 +284,23 @@ const dictionaries: Record<Locale, Dictionary> = {
       newsletterTitle: "იყავი კავშირზე.",
       newsletterDescription:
         "მიიღე სეზონური მარშრუტები, აღდგენილი ძეგლები და კურატორის ჩანაწერები საქართველოდან.",
+      regionsMapEyebrow: "ინტერაქტიული რეგიონების რუკა",
+      regionsMapTitle: "დააყენე კურსორი რუკაზე და გადადი კონკრეტული რეგიონის ისტორიაში.",
+      regionsMapDescription:
+        "ყველა რეგიონი თავიდან შავ-თეთრია. გადაადგილდი რუკაზე, რომ ფერი დაბრუნდეს, ნახო მთავარი ისტორიები და გადახვიდე რეგიონის სრულ გვერდზე.",
+      regionsMapHint: "დააყენე კურსორი პრევიუსთვის. დაკლიკე რეგიონის სრულ გვერდზე გადასასვლელად.",
+      regionsLiveLabel: "აქტიური რეგიონები",
+      storiesLiveLabel: "აქტიური ისტორიები",
+    },
+    region: {
+      eyebrow: "რეგიონის პროფილი",
+      offeringsTitle: "რას გთავაზობს ეს რეგიონი",
+      featuredStories: "რჩეული ისტორიები",
+      exploreRegion: "რეგიონის ნახვა",
+      browseDestinations: "ყველა მიმართულება",
+      publishedStories: "გამოქვეყნებული ისტორიები",
+      noStories:
+        "ამ რეგიონის ისტორიები ახლა კურაციის პროცესშია. დაამატე ჩანაწერები CMS-ში, რომ გვერდი შინაარსით შეივსოს.",
     },
     listing: {
       heritageKicker: "კურირებული მემკვიდრეობა",
@@ -335,6 +384,23 @@ const dictionaries: Record<Locale, Dictionary> = {
       newsletterTitle: "Оставайтесь на связи.",
       newsletterDescription:
         "Получайте сезонные маршруты, новости реставрации и кураторские заметки со всей Грузии.",
+      regionsMapEyebrow: "Интерактивная карта регионов",
+      regionsMapTitle: "Наведите на карту курсор и откройте отдельную историю региона.",
+      regionsMapDescription:
+        "Сначала регионы показаны в оттенках серого. Наведите курсор, чтобы вернуть исходный цвет, увидеть сильные истории и перейти на полноценную страницу региона.",
+      regionsMapHint: "Наведите курсор для превью. Кликните, чтобы открыть страницу региона.",
+      regionsLiveLabel: "Активные регионы",
+      storiesLiveLabel: "Истории в эфире",
+    },
+    region: {
+      eyebrow: "Профиль региона",
+      offeringsTitle: "Что предлагает этот регион",
+      featuredStories: "Главные истории",
+      exploreRegion: "Открыть регион",
+      browseDestinations: "Все направления",
+      publishedStories: "Опубликованные истории",
+      noStories:
+        "Истории для этого региона сейчас курируются. Добавьте материалы в CMS, чтобы наполнить страницу содержанием.",
     },
     listing: {
       heritageKicker: "Кураторское наследие",

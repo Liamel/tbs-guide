@@ -1,11 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, Compass, Landmark, Wine } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 import { DestinationCard } from "@/components/marketing/destination-card";
 import { EntryCard } from "@/components/marketing/entry-card";
+import { RegionsHero } from "@/components/marketing/regions-hero";
 import { Button } from "@/components/ui/button";
-import { getDestinationViews, getHomepageView, listEntriesBySection } from "@/lib/content/service";
+import { getDestinationViews, getHomepageView, getRegionSummaryViews, listEntriesBySection } from "@/lib/content/service";
 import { assertLocale, getDictionary } from "@/lib/i18n";
 
 function SectionHeader({
@@ -41,9 +41,10 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   const locale = assertLocale(lang);
   const dict = getDictionary(locale);
-  const [home, destinations, vineyards] = await Promise.all([
+  const [home, destinations, regionSummaries, vineyards] = await Promise.all([
     getHomepageView(locale),
     getDestinationViews(locale),
+    getRegionSummaryViews(locale),
     listEntriesBySection(locale, "vineyards"),
   ]);
   const vineyardFeature = home.featuredVineyard ?? vineyards[0];
@@ -51,84 +52,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
   return (
     <div className="space-y-16 pb-6 pt-6 sm:space-y-24">
       <section id="destinations" className="editorial-shell scroll-mt-32 space-y-8">
-        <div className="grid gap-6 lg:grid-cols-[1.18fr_0.82fr]">
-          <div className="relative min-h-[560px] overflow-hidden rounded-[2rem] lg:min-h-[680px]">
-            <Image
-              src={home.hero.featuredImageUrl}
-              alt={home.hero.lead}
-              fill
-              priority
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 64vw"
-            />
-            <div className="hero-mask absolute inset-0" />
-            <div className="relative z-10 flex h-full flex-col justify-between px-6 py-8 sm:px-10 sm:py-10">
-              <div className="space-y-5">
-                <p className="eyebrow text-white/75">{home.hero.kicker}</p>
-                <div className="max-w-xl space-y-2">
-                  <h1 className="section-title text-white">
-                    {home.hero.lead}{" "}
-                    <span className="text-[#ff8f79]">{home.hero.accent}</span>
-                  </h1>
-                  <p className="max-w-lg text-base leading-7 text-white/78 sm:text-lg">
-                    {home.hero.description}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  <Button
-                    render={<Link href={`/${locale}/heritage`} />}
-                    className="velvet-button rounded-xl px-5 py-5 text-sm"
-                  >
-                    {home.hero.primaryCtaLabel}
-                  </Button>
-                  <Button
-                    render={<Link href={`/${locale}/vineyards`} />}
-                    variant="outline"
-                    className="glass-panel rounded-xl border-white/20 bg-white/10 px-5 py-5 text-sm text-white hover:bg-white/15 hover:text-white"
-                  >
-                    {home.hero.secondaryCtaLabel}
-                  </Button>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 text-white/78">
-                <Compass className="size-4" />
-                {dict.home.kicker}
-              </div>
-            </div>
-          </div>
-
-          <div className="surface-break flex flex-col justify-between rounded-[2rem] px-6 py-8 sm:px-8">
-            <div className="space-y-6">
-              <div className="eyebrow">KARTLI EDITION</div>
-              <div className="space-y-3">
-                <h2 className="font-heading text-3xl leading-tight sm:text-4xl">
-                  Discover routes where architecture, wine, and ritual become one story.
-                </h2>
-                <p className="text-base leading-7 text-muted-foreground">
-                  This first edition focuses on heritage landmarks and cultural routes that feel
-                  editorial, tactile, and distinctly Georgian.
-                </p>
-              </div>
-            </div>
-            <div className="grid gap-3 pt-8 sm:grid-cols-3">
-              <div className="glass-panel rounded-[1.4rem] px-4 py-4">
-                <Landmark className="mb-3 size-5 text-primary" />
-                <p className="font-heading text-lg">60+</p>
-                <p className="text-sm text-muted-foreground">historic monuments</p>
-              </div>
-              <div className="glass-panel rounded-[1.4rem] px-4 py-4">
-                <Wine className="mb-3 size-5 text-primary" />
-                <p className="font-heading text-lg">8k</p>
-                <p className="text-sm text-muted-foreground">years of wine culture</p>
-              </div>
-              <div className="glass-panel rounded-[1.4rem] px-4 py-4">
-                <Compass className="mb-3 size-5 text-primary" />
-                <p className="font-heading text-lg">3</p>
-                <p className="text-sm text-muted-foreground">languages at launch</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <RegionsHero hero={home.hero} regions={regionSummaries} locale={locale} />
 
         <div className="space-y-6">
           <SectionHeader
@@ -142,7 +66,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
               <DestinationCard
                 key={destination.id}
                 destination={destination}
-                href={`/${locale}/destinations#${destination.slug}`}
+                href={`/${locale}/regions/${destination.slug}`}
                 locale={locale}
               />
             ))}

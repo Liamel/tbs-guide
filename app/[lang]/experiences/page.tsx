@@ -4,10 +4,14 @@ import { EntryCard } from "@/components/marketing/entry-card";
 
 export default async function ExperiencesPage({
   params,
+  searchParams,
 }: PageProps<"/[lang]/experiences">) {
   const { lang } = await params;
   const locale = assertLocale(lang);
-  const entries = await listEntriesBySection(locale, "experiences");
+  const query = await searchParams;
+  const entries = await listEntriesBySection(locale, "experiences", {
+    regionSlug: typeof query.region === "string" ? query.region : undefined,
+  });
 
   return (
     <div className="editorial-shell space-y-8 py-10">

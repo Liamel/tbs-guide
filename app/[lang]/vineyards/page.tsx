@@ -2,10 +2,16 @@ import { assertLocale } from "@/lib/i18n";
 import { listEntriesBySection } from "@/lib/content/service";
 import { EntryCard } from "@/components/marketing/entry-card";
 
-export default async function VineyardsPage({ params }: PageProps<"/[lang]/vineyards">) {
+export default async function VineyardsPage({
+  params,
+  searchParams,
+}: PageProps<"/[lang]/vineyards">) {
   const { lang } = await params;
   const locale = assertLocale(lang);
-  const entries = await listEntriesBySection(locale, "vineyards");
+  const query = await searchParams;
+  const entries = await listEntriesBySection(locale, "vineyards", {
+    regionSlug: typeof query.region === "string" ? query.region : undefined,
+  });
 
   return (
     <div className="editorial-shell space-y-8 py-10">

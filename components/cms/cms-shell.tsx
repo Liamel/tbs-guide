@@ -45,7 +45,7 @@ export function CmsShell({ user, children }: CmsShellProps) {
             <p className="cms-kicker">Workflow</p>
             <p className="mt-2 font-heading text-xl text-foreground">Edit, review, publish.</p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Entries hold the public stories, media powers every hero image, and the homepage editor manages the landing page copy.
+              Regions drive the homepage map, entries hold the public stories, and media powers every hero image across the guide.
             </p>
             <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-border/70 bg-white/80 px-3 py-1.5 text-xs font-medium text-muted-foreground">
               <Keyboard className="size-3.5" />

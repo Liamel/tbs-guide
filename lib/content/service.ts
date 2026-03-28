@@ -19,14 +19,19 @@ import type {
   EntryCardView,
   EntryDetailView,
   EntryRecord,
-  MediaAssetRecord,
   HomepageView,
+  MediaAssetRecord,
+  RegionPageView,
+  RegionSummaryView,
   SearchResultView,
   SiteSnapshot,
 } from "@/lib/content/types";
 import type { EntrySection, EntryType, Locale } from "@/lib/i18n";
 import { normalizeMediaAssetUrl } from "@/lib/content/media";
+import { defaultRegions } from "@/lib/content/regions";
 import { sampleSiteSnapshot } from "@/lib/content/sample-data";
+
+const sectionOrder: EntrySection[] = ["heritage", "vineyards", "experiences"];
 
 function fallbackSnapshot() {
   return normalizeSnapshot(structuredClone(sampleSiteSnapshot));
@@ -42,8 +47,21 @@ function normalizeMediaAssetRecord(asset: MediaAssetRecord): MediaAssetRecord {
 function normalizeSnapshot(snapshot: SiteSnapshot): SiteSnapshot {
   return {
     ...snapshot,
+    regions: mergeDefaultRegions(snapshot.regions),
     mediaAssets: snapshot.mediaAssets.map(normalizeMediaAssetRecord),
   };
+}
+
+function mergeDefaultRegions(snapshotRegions: SiteSnapshot["regions"]) {
+  const snapshotRegionMap = new Map(snapshotRegions.map((region) => [region.slug, region]));
+  const extraRegions = snapshotRegions.filter(
+    (region) => !defaultRegions.some((defaultRegion) => defaultRegion.slug === region.slug),
+  );
+
+  return [
+    ...defaultRegions.map((defaultRegion) => snapshotRegionMap.get(defaultRegion.slug) ?? defaultRegion),
+    ...extraRegions,
+  ].sort((left, right) => left.orderIndex - right.orderIndex);
 }
 
 async function loadSnapshotFromDatabase(): Promise<SiteSnapshot> {
@@ -214,6 +232,44 @@ function buildCardView(
   };
 }
 
+function getPublishedRegionEntries(snapshot: SiteSnapshot, regionId: string) {
+  return snapshot.entries
+    .filter((entry) => entry.isPublished && entry.regionId === regionId)
+    .sort((left, right) => left.sortOrder - right.sortOrder);
+}
+
+function buildRegionSummary(
+  snapshot: SiteSnapshot,
+  locale: Locale,
+  region: SiteSnapshot["regions"][number],
+): RegionSummaryView {
+  const regionEntries = getPublishedRegionEntries(snapshot, region.id);
+  const regionCards = regionEntries.map((entry) => buildCardView(snapshot, entry, locale));
+  const leadCard = regionCards[0];
+
+  return {
+    id: region.id,
+    slug: region.slug,
+    name: pickLocaleText(region.name, locale),
+    description: pickLocaleText(region.description, locale),
+    imageUrl: leadCard?.imageUrl ?? sampleSiteSnapshot.mediaAssets[0].secureUrl,
+    imageAlt: leadCard?.imageAlt || pickLocaleText(region.name, locale),
+    storyCount: regionCards.length,
+    sectionCounts: sectionOrder
+      .map((section) => ({
+        section,
+        count: regionCards.filter((card) => card.section === section).length,
+      }))
+      .filter((group) => group.count > 0),
+    featuredStories: regionCards.slice(0, 3).map((card) => ({
+      id: card.id,
+      slug: card.slug,
+      title: card.title,
+      section: card.section,
+    })),
+  };
+}
+
 function scoreSearchMatch(text: string, query: string, title: string, summary: string, regionName: string) {
   let score = 0;
 
@@ -244,26 +300,54 @@ export async function getDestinationViews(locale: Locale): Promise<DestinationVi
   return snapshot.regions
     .slice()
     .sort((left, right) => left.orderIndex - right.orderIndex)
-    .map((region) => {
-      const regionEntries = snapshot.entries
-        .filter((entry) => entry.isPublished && entry.regionId === region.id)
-        .sort((left, right) => left.sortOrder - right.sortOrder);
-      const leadEntry = regionEntries[0];
-      const leadCard = leadEntry ? buildCardView(snapshot, leadEntry, locale) : undefined;
+    .map((region) => buildRegionSummary(snapshot, locale, region))
+    .filter((region) => region.storyCount > 0)
+    .map((region) => ({
+      id: region.id,
+      slug: region.slug,
+      name: region.name,
+      description: region.description,
+      imageUrl: region.imageUrl,
+      imageAlt: region.imageAlt,
+      storyCount: region.storyCount,
+      sections: region.sectionCounts.map((group) => group.section),
+    }));
+}
 
-      return {
-        id: region.id,
-        slug: region.slug,
-        name: pickLocaleText(region.name, locale),
-        description: pickLocaleText(region.description, locale),
-        imageUrl: leadCard?.imageUrl ?? sampleSiteSnapshot.mediaAssets[0].secureUrl,
-        imageAlt: leadCard?.imageAlt || pickLocaleText(region.name, locale),
-        storyCount: regionEntries.length,
-        sections: Array.from(
-          new Set(regionEntries.map((entry) => getSectionFromEntryType(entry.type))),
-        ),
-      };
-    });
+export async function getRegionSummaryViews(locale: Locale): Promise<RegionSummaryView[]> {
+  const snapshot = await loadSiteSnapshot();
+
+  return snapshot.regions
+    .slice()
+    .sort((left, right) => left.orderIndex - right.orderIndex)
+    .map((region) => buildRegionSummary(snapshot, locale, region));
+}
+
+export async function getRegionPageView(
+  locale: Locale,
+  slug: string,
+): Promise<RegionPageView | null> {
+  const snapshot = await loadSiteSnapshot();
+  const region = snapshot.regions.find((candidate) => candidate.slug === slug);
+
+  if (!region) {
+    return null;
+  }
+
+  const summary = buildRegionSummary(snapshot, locale, region);
+  const regionCards = getPublishedRegionEntries(snapshot, region.id).map((entry) =>
+    buildCardView(snapshot, entry, locale),
+  );
+
+  return {
+    ...summary,
+    entriesBySection: sectionOrder
+      .map((section) => ({
+        section,
+        entries: regionCards.filter((card) => card.section === section),
+      }))
+      .filter((group) => group.entries.length > 0),
+  };
 }
 
 export async function searchEntries(
@@ -452,7 +536,16 @@ export async function getEntryCategoryOptions(type?: EntryType) {
     .sort((left, right) => left.orderIndex - right.orderIndex);
 }
 
-export async function getEntryRegionOptions() {
+export async function getEntryRegionOptions(section?: EntrySection) {
   const snapshot = await loadSiteSnapshot();
-  return snapshot.regions.sort((left, right) => left.orderIndex - right.orderIndex);
+  const entryType = section ? getEntryTypeFromSection(section) : null;
+  const activeRegionIds = new Set(
+    snapshot.entries
+      .filter((entry) => entry.isPublished && (!entryType || entry.type === entryType))
+      .map((entry) => entry.regionId),
+  );
+
+  return snapshot.regions
+    .filter((region) => activeRegionIds.has(region.id))
+    .sort((left, right) => left.orderIndex - right.orderIndex);
 }

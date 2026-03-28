@@ -172,6 +172,35 @@ export type DestinationView = {
   sections: EntrySection[];
 };
 
+export type RegionOfferView = {
+  section: EntrySection;
+  count: number;
+};
+
+export type RegionSummaryView = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  imageAlt: string;
+  storyCount: number;
+  sectionCounts: RegionOfferView[];
+  featuredStories: {
+    id: string;
+    slug: string;
+    title: string;
+    section: EntrySection;
+  }[];
+};
+
+export type RegionPageView = RegionSummaryView & {
+  entriesBySection: {
+    section: EntrySection;
+    entries: EntryCardView[];
+  }[];
+};
+
 export type SearchResultView = {
   id: string;
   slug: string;

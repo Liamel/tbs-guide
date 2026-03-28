@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ImageIcon, LayoutDashboard, Newspaper, Users } from "lucide-react";
+import { ImageIcon, LayoutDashboard, Map, Newspaper, Users } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/CMS/home", label: "Dashboard", icon: LayoutDashboard, ownerOnly: false },
   { href: "/CMS/entries", label: "Entries", icon: Newspaper, ownerOnly: false },
+  { href: "/CMS/regions", label: "Regions", icon: Map, ownerOnly: false },
   { href: "/CMS/media", label: "Media", icon: ImageIcon, ownerOnly: false },
   { href: "/CMS/users", label: "Users", icon: Users, ownerOnly: true },
 ] as const;

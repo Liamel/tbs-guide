@@ -20,6 +20,7 @@ import {
   homepageContent,
   homepageFeatureSlots,
   mediaAssets,
+  regions,
   users,
 } from "@/lib/data/schema";
 import type { CmsRole } from "@/lib/auth/roles";
@@ -29,10 +30,12 @@ import {
   ensurePublishableTranslations,
   entryFormSchema,
   homepageFormSchema,
+  regionsFormSchema,
   type CmsPasswordResetValues,
   type CmsUserCreateValues,
   type EntryFormValues,
   type HomepageFormValues,
+  type RegionsFormValues,
 } from "@/lib/content/validators";
 import { locales } from "@/lib/i18n";
 
@@ -54,6 +57,9 @@ function revalidateAllPublicPaths() {
   revalidatePath("/en");
   revalidatePath("/ka");
   revalidatePath("/ru");
+  revalidatePath("/en/regions/[slug]", "page");
+  revalidatePath("/ka/regions/[slug]", "page");
+  revalidatePath("/ru/regions/[slug]", "page");
   revalidatePath("/en/heritage");
   revalidatePath("/ka/heritage");
   revalidatePath("/ru/heritage");
@@ -69,6 +75,7 @@ function revalidateAllPublicPaths() {
   revalidatePath("/CMS/home");
   revalidatePath("/CMS/entries");
   revalidatePath("/CMS/media");
+  revalidatePath("/CMS/regions");
   revalidatePath("/CMS/users");
 }
 
@@ -224,6 +231,39 @@ export async function saveHomepageAction(payload: HomepageFormValues) {
       })),
     );
   }
+
+  revalidateAllPublicPaths();
+
+  return { success: true };
+}
+
+export async function saveRegionsAction(payload: RegionsFormValues) {
+  await requireCmsSession();
+  const values = regionsFormSchema.parse(payload);
+  const db = assertDatabase();
+
+  await Promise.all(
+    values.regions.map((region) =>
+      db
+        .insert(regions)
+        .values({
+          id: region.id ?? crypto.randomUUID(),
+          slug: region.slug.trim().toLowerCase(),
+          orderIndex: region.orderIndex,
+          name: region.name,
+          description: region.description,
+        })
+        .onConflictDoUpdate({
+          target: regions.id,
+          set: {
+            slug: region.slug.trim().toLowerCase(),
+            orderIndex: region.orderIndex,
+            name: region.name,
+            description: region.description,
+          },
+        }),
+    ),
+  );
 
   revalidateAllPublicPaths();
 

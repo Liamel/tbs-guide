@@ -3,7 +3,7 @@
 import { useEffect, useEffectEvent, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
-import { HelpCircle, ImageIcon, LayoutDashboard, Newspaper, Plus, Users } from "lucide-react";
+import { HelpCircle, ImageIcon, LayoutDashboard, Map, Newspaper, Plus, Users } from "lucide-react";
 
 import {
   CommandDialog,
@@ -39,6 +39,7 @@ function isEditableTarget(target: EventTarget | null) {
 const commands = [
   { label: "Dashboard", href: "/CMS/home", shortcut: "g h", icon: LayoutDashboard, ownerOnly: false },
   { label: "Entries", href: "/CMS/entries", shortcut: "g e", icon: Newspaper, ownerOnly: false },
+  { label: "Regions", href: "/CMS/regions", shortcut: "g r", icon: Map, ownerOnly: false },
   { label: "Media", href: "/CMS/media", shortcut: "g m", icon: ImageIcon, ownerOnly: false },
   { label: "Users", href: "/CMS/users", shortcut: "g u", icon: Users, ownerOnly: true },
   { label: "New Entry", href: "/CMS/entries/new", shortcut: "n", icon: Plus, ownerOnly: false },
@@ -65,6 +66,10 @@ export function CmsHotkeys({ canManageUsers }: { canManageUsers: boolean }) {
 
     if (key === "e") {
       router.push("/CMS/entries");
+    }
+
+    if (key === "r") {
+      router.push("/CMS/regions");
     }
 
     if (key === "m") {
@@ -200,10 +205,10 @@ export function CmsHotkeys({ canManageUsers }: { canManageUsers: boolean }) {
               ["Ctrl/Cmd + K", "Open command palette"],
               ["/", "Focus search"],
               [
-                canManageUsers ? "g h / g e / g m / g u" : "g h / g e / g m",
+                canManageUsers ? "g h / g e / g r / g m / g u" : "g h / g e / g r / g m",
                 canManageUsers
-                  ? "Jump between dashboard, entries, media, and users"
-                  : "Jump between dashboard, entries, and media",
+                  ? "Jump between dashboard, entries, regions, media, and users"
+                  : "Jump between dashboard, entries, regions, and media",
               ],
               ["n", "Create a new entry"],
               ["Ctrl/Cmd + S", "Save current editor"],

@@ -21,7 +21,7 @@ export default async function HeritagePage({
       regionSlug: typeof query.region === "string" ? query.region : undefined,
     }),
     getEntryCategoryOptions("heritage"),
-    getEntryRegionOptions(),
+    getEntryRegionOptions("heritage"),
   ]);
 
   const [featuredPrimary, featuredSecondary, ...rest] = entries;

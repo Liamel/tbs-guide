@@ -35,7 +35,7 @@ export default async function DestinationsPage({
           <div key={destination.id} id={destination.slug} className="scroll-mt-32">
             <DestinationCard
               destination={destination}
-              href={`/${locale}/heritage?region=${destination.slug}`}
+              href={`/${locale}/regions/${destination.slug}`}
               locale={locale}
             />
           </div>

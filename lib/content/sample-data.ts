@@ -8,71 +8,11 @@ import type {
   RegionRecord,
   SiteSnapshot,
 } from "@/lib/content/types";
+import { defaultRegions } from "@/lib/content/regions";
 
 const isoNow = "2026-03-26T00:00:00.000Z";
 
-const regions: RegionRecord[] = [
-  {
-    id: "region-kartli",
-    slug: "kartli",
-    name: {
-      en: "Kartli",
-      ka: "ქართლი",
-      ru: "Картли",
-    },
-    description: {
-      en: "Historic heartland of kingdoms, monasteries, and mountain ridges.",
-      ka: "სამეფოების, მონასტრებისა და მთების ისტორიული გული.",
-      ru: "Историческое сердце царств, монастырей и горных хребтов.",
-    },
-    orderIndex: 1,
-  },
-  {
-    id: "region-kakheti",
-    slug: "kakheti",
-    name: {
-      en: "Kakheti",
-      ka: "კახეთი",
-      ru: "Кахетия",
-    },
-    description: {
-      en: "Georgia’s wine country, shaped by cellars, terraces, and harvest ritual.",
-      ka: "საქართველოს ღვინის მხარე, სარდაფებითა და მოსავლის რიტუალებით.",
-      ru: "Винный регион Грузии с погребами, террасами и ритуалом сбора урожая.",
-    },
-    orderIndex: 2,
-  },
-  {
-    id: "region-svaneti",
-    slug: "svaneti",
-    name: {
-      en: "Svaneti",
-      ka: "სვანეთი",
-      ru: "Сванети",
-    },
-    description: {
-      en: "High mountain towers and alpine settlements at the edge of the Caucasus.",
-      ka: "მაღალი მთის კოშკები და ალპური სოფლები კავკასიონის კიდეზე.",
-      ru: "Высокогорные башни и альпийские поселения у края Кавказа.",
-    },
-    orderIndex: 3,
-  },
-  {
-    id: "region-samtskhe-javakheti",
-    slug: "samtskhe-javakheti",
-    name: {
-      en: "Samtskhe-Javakheti",
-      ka: "სამცხე-ჯავახეთი",
-      ru: "Самцхе-Джавахети",
-    },
-    description: {
-      en: "Cave cities, fortresses, and volcanic plateaus in southern Georgia.",
-      ka: "გამოქვაბულები, ციხეები და ვულკანური ზეგნები სამხრეთ საქართველოში.",
-      ru: "Пещерные города, крепости и вулканические плато юга Грузии.",
-    },
-    orderIndex: 4,
-  },
-];
+const regions: RegionRecord[] = defaultRegions;
 
 const categories: CategoryRecord[] = [
   {
@@ -305,7 +245,7 @@ const entries: EntryRecord[] = [
     id: "entry-gergeti",
     type: "heritage",
     slug: "gergeti-trinity-church",
-    regionId: "region-kartli",
+    regionId: "region-mtskheta-mtianeti",
     heroMediaId: "media-gergeti",
     categoryIds: ["cat-all-sites", "cat-monasteries"],
     address: emptyLocaleText("Stepantsminda, Mtskheta-Mtianeti"),
@@ -329,7 +269,7 @@ const entries: EntryRecord[] = [
     id: "entry-ushguli",
     type: "heritage",
     slug: "ushguli-towers",
-    regionId: "region-svaneti",
+    regionId: "region-samegrelo-zemo-svaneti",
     heroMediaId: "media-ushguli",
     categoryIds: ["cat-all-sites", "cat-fortresses"],
     address: emptyLocaleText("Ushguli, Svaneti"),
@@ -353,7 +293,7 @@ const entries: EntryRecord[] = [
     id: "entry-uplistsikhe",
     type: "heritage",
     slug: "uplistsikhe-cave-city",
-    regionId: "region-kartli",
+    regionId: "region-shida-kartli",
     heroMediaId: "media-uplistsikhe",
     categoryIds: ["cat-all-sites", "cat-ancient-cities"],
     address: emptyLocaleText("Shida Kartli"),
@@ -377,7 +317,7 @@ const entries: EntryRecord[] = [
     id: "entry-jvari",
     type: "heritage",
     slug: "jvari-monastery",
-    regionId: "region-kartli",
+    regionId: "region-mtskheta-mtianeti",
     heroMediaId: "media-jvari",
     categoryIds: ["cat-all-sites", "cat-monasteries"],
     address: {
@@ -589,7 +529,7 @@ const entries: EntryRecord[] = [
     id: "entry-polyphony",
     type: "experience",
     slug: "polyphonic-singing-evening",
-    regionId: "region-kartli",
+    regionId: "region-tbilisi",
     heroMediaId: "media-polyphony",
     categoryIds: [],
     address: emptyLocaleText("Tbilisi"),
@@ -613,7 +553,7 @@ const entries: EntryRecord[] = [
     id: "entry-supra",
     type: "experience",
     slug: "the-supra-feast",
-    regionId: "region-kartli",
+    regionId: "region-mtskheta-mtianeti",
     heroMediaId: "media-supra",
     categoryIds: [],
     address: emptyLocaleText("Mtskheta"),
@@ -637,7 +577,7 @@ const entries: EntryRecord[] = [
     id: "entry-artisans",
     type: "experience",
     slug: "blue-tablecloth-workshop",
-    regionId: "region-kartli",
+    regionId: "region-tbilisi",
     heroMediaId: "media-artisans",
     categoryIds: [],
     address: emptyLocaleText("Tbilisi"),
