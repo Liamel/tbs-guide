@@ -207,7 +207,11 @@ export function RegionsHero({ hero, regions, locale }: RegionsHeroProps) {
                       strokeWidth={isActive ? 0.5 : 0.24}
                       strokeLinejoin="round"
                       className="cursor-pointer transition-[fill,stroke,stroke-width] duration-300"
+                      style={{ outline: "none" }}
                       onMouseEnter={() => setHoveredSlug(area.slug)}
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                      }}
                       onFocus={() => setHoveredSlug(area.slug)}
                       onBlur={() => setHoveredSlug(null)}
                       onClick={() => router.push(href)}
